@@ -20,8 +20,7 @@ winforms
 
 # FHM Crawler - http://freehardmusic.com/
 
-### A simple program to crawl download urls of albums from http://freehardmusic.com/ website, 
-which has a giant database focused to Rock music and sub-genres.
+### A simple program to crawl download urls of albums from http://freehardmusic.com/ website, which has a giant database focused to Rock music and sub-genres.
 
 ------------------
 
