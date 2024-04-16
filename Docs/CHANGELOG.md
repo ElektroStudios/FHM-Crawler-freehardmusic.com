@@ -11,7 +11,8 @@
 #### 🌟 Improvements:
  - Source-code now targets .NET Framework 4.8
  - Default user-interface font changed to Segoe UI (10pt)
+ - Added a default icon for the executable file.
  - Minor code changes and optimizations.
-
+ 
 ## v1.0 🔄
 Initial Release.
