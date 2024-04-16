@@ -12,7 +12,7 @@ Imports HtmlDocument = HtmlAgilityPack.HtmlDocument
 Imports HtmlNode = HtmlAgilityPack.HtmlNode
 Imports HtmlNodeCollection = HtmlAgilityPack.HtmlNodeCollection
 
-Imports ElektroKit.Core.Extensions.NameValueCollection
+Imports DevCase.Core.Extensions.NameValueCollection
 
 #End Region
 
@@ -31,12 +31,14 @@ Namespace FHM
         Private cancelToken As CancellationToken
         Private cancelTokenSrc As CancellationTokenSource
         Private isFetching As Boolean
+        Private ReadOnly client As CookieAwareWebClient
 
 #End Region
 
 #Region " Properties "
 
         Public ReadOnly Property SearchFilter As SearchFilter
+        Public Property Cookies As CookieContainer
 
 #End Region
 
@@ -49,7 +51,13 @@ Namespace FHM
 
 #Region " Constructors "
 
-        Public Sub New()
+        Public Sub New(cookies As CookieContainer)
+            Me.Cookies = cookies
+
+            Me.client = New CookieAwareWebClient With {
+                .Cookies = Me.Cookies
+            }
+
             Me.SearchFilter = New SearchFilter()
             Me.cancelTokenSrc = New CancellationTokenSource()
             Me.cancelToken = Me.cancelTokenSrc.Token
@@ -68,18 +76,19 @@ Namespace FHM
 
         Public Async Function GetAlbumCountAsync() As Task(Of Integer)
             Dim searchQueary As String = Me.GetSearchQueary(pageindex:=0)
+
             Dim uriSearch As New Uri(searchQueary)
-            Dim htmlSourceCode As String = String.Empty
-            Using wc As New WebClient
-                htmlSourceCode = Await wc.DownloadStringTaskAsync(uriSearch)
-            End Using
+            Dim htmlSourceCode As String = Await Me.client.DownloadStringTaskAsync(uriSearch)
 
             Dim htmldoc As New HtmlDocument
             htmldoc.LoadHtml(htmlSourceCode)
 
-            Dim xPathResultString As String = "//div[@id='mainbody']/table[1]/tr[2]/td"
+            Dim xPathResultString As String = "//div[@id='content']/div[@id='content_container']/div[@class='floatbox']/table[1]/tr[2]/td"
 
             Dim node As HtmlNode = htmldoc.DocumentNode.SelectSingleNode(xPathResultString)
+            If node Is Nothing Then
+                Return 0
+            End If
 
             Dim text As String = node.InnerText
             text = Regex.Replace(text, "\n", "", RegexOptions.None)    ' Remove new lines.
@@ -88,6 +97,7 @@ Namespace FHM
 
             Dim albumCount As Integer = CInt(Regex.Match(text, "\d+", RegexOptions.None).Value)
             Return albumCount
+
         End Function
 
         Public Sub FetchAlbums()
@@ -115,10 +125,7 @@ Namespace FHM
             For i As Integer = 0 To (maxPages - 1)
                 Dim searchQueary As String = Me.GetSearchQueary(pageindex:=i)
                 Dim uriSearch As New Uri(searchQueary)
-                Dim htmlSourceCode As String = String.Empty
-                Using wc As New WebClient
-                    htmlSourceCode = Await wc.DownloadStringTaskAsync(uriSearch)
-                End Using
+                Dim htmlSourceCode As String = Await Me.client.DownloadStringTaskAsync(uriSearch)
 
                 If (Me.cancelToken.IsCancellationRequested) Then
                     Me.isFetching = False
@@ -157,12 +164,13 @@ Namespace FHM
 
 #Region " Private Methods "
 
-        Private Function GetSearchQueary(ByVal pageindex As Integer) As String
+        Private Function GetSearchQueary(pageindex As Integer) As String
             Dim searchParams As New NameValueCollection From {
                     {"field_band", Me.SearchFilter.Artist},
                     {"field_country", Me.SearchFilter.Country},
                     {"field_genre", Me.SearchFilter.Genre},
                     {"field_year", Me.SearchFilter.Year},
+                    {"field_format", "0"},
                     {"option", "com_sobi2"},
                     {"search", "Search"},
                     {"searchphrase", "exact"},
@@ -170,13 +178,15 @@ Namespace FHM
                     {"sobi2Task", "axSearch"},
                     {"SobiCatSelected_0", "0"},
                     {"sobiCid", "0"},
+                    {"reset", "2"},
+                    {"Itemid", "13"},
                     {"SobiSearchPage", CStr(pageindex)}
                 }
 
             Return searchParams.ToQueryString(Me.uriIndex)
         End Function
 
-        Private Async Function ParseHtmlSourceCode(ByVal pageindex As Integer, ByVal htmlSourceCode As String) As Task(Of Boolean)
+        Private Async Function ParseHtmlSourceCode(pageindex As Integer, htmlSourceCode As String) As Task(Of Boolean)
 
             Dim albums As New List(Of AlbumInfo)
 
@@ -237,9 +247,7 @@ Namespace FHM
 
                 Dim downloadUrls As List(Of String)
                 Try
-                    Using wc As New WebClient()
-                        htmlSourceCode = Await wc.DownloadStringTaskAsync(New Uri(downloadUrlParams.ToQueryString(Me.uriIndex2)))
-                    End Using
+                    htmlSourceCode = Await Me.client.DownloadStringTaskAsync(New Uri(downloadUrlParams.ToQueryString(Me.uriIndex2)))
 
                     Dim xDoc As XDocument = XDocument.Parse(htmlSourceCode)
                     Dim elements As IEnumerable(Of XElement) = xDoc.<rev>

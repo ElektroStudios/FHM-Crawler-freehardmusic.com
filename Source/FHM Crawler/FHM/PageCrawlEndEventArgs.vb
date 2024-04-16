@@ -10,7 +10,7 @@ Namespace FHM
         Private Sub New()
         End Sub
 
-        Public Sub New(ByVal pageIndex As Integer, ByVal albums As List(Of AlbumInfo))
+        Public Sub New(pageIndex As Integer, albums As List(Of AlbumInfo))
             Me.PageIndex = pageIndex
             Me.Albums = albums
         End Sub

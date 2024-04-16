@@ -1,26 +1,32 @@
-﻿Imports FHM
+﻿Imports System.Net
 
-Imports ElektroKit.Core.Application.UserInterface.Types
-Imports ElektroKit.Core.Application.UserInterface.Enums
-Imports ElektroKit.Core.Extensions.ListView
+Imports FHM
+
+Imports DevCase.Core.Application.UserInterface.Types
+Imports DevCase.Core.Application.UserInterface.Enums
+Imports DevCase.Core.Extensions.ListView
+Imports DevCase.Core.Net
 
 Public Class Main
 
     Private WithEvents FHMCrawler As Crawler
     Private sorter As New ListViewColumnSorter
     Private albumCount As Integer
+    Private isLoggedIn As Boolean
+    Private cookies As CookieContainer
 
     Public Sub New()
         ' This call is required by the designer.
         MyClass.InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
-        Me.FHMCrawler = New Crawler()
         Me.sorter = New ListViewColumnSorter() With {
             .Order = SortOrder.Ascending,
             .SortModifier = SortModifiers.SortByText
         }
     End Sub
+
+#Region " Event Handlers "
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.ComboBox_Country.DataSource = DataSources.countries
@@ -31,7 +37,52 @@ Public Class Main
         Me.ListView_Albums.Sorting = SortOrder.Ascending
     End Sub
 
+    Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
+        Me.MinimumSize = Me.Size
+        Me.WebBrowser1.Navigate("http://freehardmusic.com/")
+    End Sub
+
     Private Async Sub Button_FetchAlbums_Click(sender As Object, e As EventArgs) Handles Button_FetchAlbums.Click
+
+        If Me.RadioButton_ArtistSearch.Checked AndAlso String.IsNullOrWhiteSpace(Me.TextBoxArtist.Text) Then
+            MessageBox.Show(Me, "Artist TextBox is empty.",
+                                My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
+
+            Exit Sub
+        End If
+
+        Me.cookies = InternetUtil.GetCookieContainer(New Uri("http://freehardmusic.com/"))
+        If Me.cookies Is Nothing Then
+            MessageBox.Show(Me, "Session cookies for FHM website not found." & Environment.NewLine & Environment.NewLine &
+                                $"Please select the '{Me.TabPageBrowser.Text}' tab to log in, then try again.",
+                                My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Exit Sub
+        End If
+
+        Dim userNameFound As Boolean
+        For Each c As Cookie In Me.cookies.GetCookies(New Uri("http://freehardmusic.com/"))
+            If c.Expired Then
+                MessageBox.Show(Me, "Session cookies for FHM website has expired." & Environment.NewLine & Environment.NewLine &
+                                    $"Please select the '{Me.TabPageBrowser.Text}' tab to log in, then try again.",
+                                    My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
+            End If
+
+            If c.Name.Equals("jalUserName") Then
+                userNameFound = True
+            End If
+        Next c
+
+        If Not userNameFound Then
+            MessageBox.Show(Me, "Username cookie for FHM website not found." & Environment.NewLine & Environment.NewLine &
+                                    $"Please select the '{Me.TabPageBrowser.Text}' tab to log in, then try again.",
+                                    My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Exit Sub
+        End If
+
+        If Me.FHMCrawler Is Nothing Then
+            Me.FHMCrawler = New Crawler(Me.cookies)
+        End If
 
         If (Me.GroupBox_ArtistSearch.Enabled) Then
             With Me.FHMCrawler.SearchFilter
@@ -54,6 +105,7 @@ Public Class Main
         Me.DisableControls()
 
         Me.Label_AlbumCount.Text = "Searching albums..."
+        Me.Label_Debug.Text = "FHM website is very slow. Please wait..."
         Me.albumCount = Await Me.FHMCrawler.GetAlbumCountAsync()
         Me.ProgressBar1.Maximum = Me.albumCount
         Me.ProgressBar1.Step = 10 ' 10 albums per page.
@@ -70,38 +122,6 @@ Public Class Main
         DirectCast(sender, Button).Enabled = False
         Me.Label_AlbumCount.Text = "Cancelling operation..."
         Me.FHMCrawler.CancelFetchAlbumsAsync()
-    End Sub
-
-    Private Sub DisableControls()
-        Me.GroupBox_ArtistSearch.Enabled = False
-        Me.GroupBox_CustomSearch.Enabled = False
-        Me.Button_FetchAlbums.Enabled = False
-        Me.Button_CopyAllAsCSV.Enabled = False
-        Me.Button_CopyCheckedItems.Enabled = False
-        Me.RadioButton_ArtistSearch.Enabled = False
-        Me.RadioButton_CustomSearch.Enabled = False
-        Me.Button_CheckAll.Enabled = False
-        Me.Button_UncheckAll.Enabled = False
-
-        Me.ProgressBar1.Value = 0
-        Me.sorter.Order = SortOrder.None
-        Me.ListView_Albums.BeginUpdate()
-        Me.ListView_Albums.Items.Clear()
-        Me.ListView_Albums.EndUpdate()
-    End Sub
-
-    Private Sub EnableControls()
-        Me.Button_Cancel.Enabled = False
-        Me.Label_AlbumCount.Text = String.Format("{0} albums fetched.", Me.ListView_Albums.Items.Count)
-        Me.GroupBox_ArtistSearch.Enabled = Me.RadioButton_ArtistSearch.Checked
-        Me.GroupBox_CustomSearch.Enabled = Me.RadioButton_CustomSearch.Checked
-        Me.Button_FetchAlbums.Enabled = True
-        Me.Button_CopyAllAsCSV.Enabled = True
-        Me.Button_CopyCheckedItems.Enabled = True
-        Me.RadioButton_ArtistSearch.Enabled = True
-        Me.RadioButton_CustomSearch.Enabled = True
-        Me.Button_CheckAll.Enabled = True
-        Me.Button_UncheckAll.Enabled = True
     End Sub
 
     Private Sub RadioButton_ArtistSearch_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton_ArtistSearch.CheckedChanged
@@ -136,7 +156,7 @@ Public Class Main
         Next
     End Sub
 
-    Private Sub ListView_Albums_ColumnClick(ByVal sender As Object, ByVal e As ColumnClickEventArgs) _
+    Private Sub ListView_Albums_ColumnClick(sender As Object, e As ColumnClickEventArgs) _
     Handles ListView_Albums.ColumnClick
 
         Dim lv As ListView = DirectCast(sender, ListView)
@@ -147,11 +167,7 @@ Public Class Main
         ' Determine whether clicked column is already the column that is being sorted.
         If (e.Column = Me.sorter.ColumnIndex) Then
             ' Reverse the current sort direction for this column.
-            If (Me.sorter.Order = SortOrder.Ascending) Then
-                Me.sorter.Order = SortOrder.Descending
-            Else
-                Me.sorter.Order = SortOrder.Ascending
-            End If
+            Me.sorter.Order = If(Me.sorter.Order = SortOrder.Ascending, SortOrder.Descending, SortOrder.Ascending)
 
         Else
             ' Set the column number that is to be sorted, default to ascending.
@@ -166,17 +182,22 @@ Public Class Main
     End Sub
 
     <DebuggerStepperBoundary>
-    Private Sub FHMCrawler_BeginPageCrawl(ByVal sender As Object, e As PageCrawlBeginEventArgs) Handles FHMCrawler.BeginPageCrawl
-#If Debug Then
-        Debug.WriteLine("Begin crawling page index: {0}", e.PageIndex)
+    Private Sub FHMCrawler_BeginPageCrawl(sender As Object, e As PageCrawlBeginEventArgs) Handles FHMCrawler.BeginPageCrawl
+        Dim msg As String = $"Begin crawling page index: {e.PageIndex}"
+        Me.Label_Debug.Text = msg
+#If DEBUG Then
+        Debug.WriteLine(msg)
 #End If
     End Sub
 
     <DebuggerStepperBoundary>
-    Private Sub FHMCrawler_EndPageCrawl(ByVal sender As Object, e As PageCrawlEndEventArgs) Handles FHMCrawler.EndPageCrawl
-#If Debug Then
-        Debug.WriteLine("End crawling page index: {0}", e.PageIndex)
+    Private Sub FHMCrawler_EndPageCrawl(sender As Object, e As PageCrawlEndEventArgs) Handles FHMCrawler.EndPageCrawl
+        Dim msg As String = $"End crawling page index: {e.PageIndex}"
+        Me.Label_Debug.Text = msg
+#If DEBUG Then
+        Debug.WriteLine(msg)
 #End If
+
         Me.ListView_Albums.BeginUpdate()
         For Each albumInfo As AlbumInfo In e.Albums
             Dim lvItem As New ListViewItem({albumInfo.Artist, albumInfo.Album, String.Format("{{{0}}}", String.Join(", ", albumInfo.DounloadUrls))})
@@ -188,5 +209,48 @@ Public Class Main
 
         Me.ProgressBar1.PerformStep()
     End Sub
+
+#End Region
+
+#Region " Private Methods "
+
+    Private Sub DisableControls()
+        TabControlExtensions.DisableTabs(Me.TabControl1, Me.TabPageBrowser)
+
+        Me.GroupBox_ArtistSearch.Enabled = False
+        Me.GroupBox_CustomSearch.Enabled = False
+        Me.Button_FetchAlbums.Enabled = False
+        Me.Button_CopyAllAsCSV.Enabled = False
+        Me.Button_CopyCheckedItems.Enabled = False
+        Me.RadioButton_ArtistSearch.Enabled = False
+        Me.RadioButton_CustomSearch.Enabled = False
+        Me.Button_CheckAll.Enabled = False
+        Me.Button_UncheckAll.Enabled = False
+
+        Me.ProgressBar1.Value = 0
+        Me.sorter.Order = SortOrder.None
+        Me.ListView_Albums.BeginUpdate()
+        Me.ListView_Albums.Items.Clear()
+        Me.ListView_Albums.EndUpdate()
+    End Sub
+
+    Private Sub EnableControls()
+        TabControlExtensions.EnableTabs(Me.TabControl1, Me.TabPageBrowser)
+
+        Me.Button_Cancel.Enabled = False
+        Me.Label_AlbumCount.Text = String.Format("{0} albums fetched.", Me.ListView_Albums.Items.Count)
+        Me.Label_Debug.Text = "..."
+        Me.GroupBox_ArtistSearch.Enabled = Me.RadioButton_ArtistSearch.Checked
+        Me.GroupBox_CustomSearch.Enabled = Me.RadioButton_CustomSearch.Checked
+        Me.Button_FetchAlbums.Enabled = True
+        Me.Button_CopyAllAsCSV.Enabled = True
+        Me.Button_CopyCheckedItems.Enabled = True
+        Me.RadioButton_ArtistSearch.Enabled = True
+        Me.RadioButton_CustomSearch.Enabled = True
+        Me.Button_CheckAll.Enabled = True
+        Me.Button_UncheckAll.Enabled = True
+    End Sub
+
+#End Region
 
 End Class

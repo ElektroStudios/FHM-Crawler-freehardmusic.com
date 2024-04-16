@@ -13,30 +13,30 @@ Imports System.Web
 
 
 
-' THIS OPEN-SOURCE APPLICATION IS POWERED BY ELEKTROKIT FRAMEWORK, CREATED BY ELEKTRO STUDIOS.
+' THIS OPEN-SOURCE APPLICATION IS POWERED BY DevCase FRAMEWORK, CREATED BY ELEKTRO STUDIOS.
 
 ' WHAT YOU SEE HERE IS FREE CUTTED CONTENT OF THIS FRAMEWORK.
 
-' IF YOU LIKED THIS FREE APPLICATION, THEN PLEASE CONSIDER TO BUY ELEKTROKIT FRAMEWORK FOR .NET AT:
-' https://codecanyon.net/item/elektrokit-class-library-for-net/19260282
+' IF YOU LIKED THIS FREE APPLICATION, THEN PLEASE CONSIDER TO BUY DevCase FRAMEWORK FOR .NET AT:
+' https://codecanyon.net/item/DevCase-class-library-for-net/19260282
 
 ' YOU CAN FIND THESE HELPER METHODS AND A MASSIVE AMOUNT MORE!, 
 ' +850 EXTENSION METHODS FOR ALL KIND OF TYPES, CUSTOM USER-CONTROLS, 
 ' EVERYTHING FOR THE NEWBIE And THE ADVANCED USER, FOR VB.NET AND C#. 
 
-' ElektroKit is a utility framework containing new APIs and extensions to the core .NET Framework 
+' DevCase is a utility framework containing new APIs and extensions to the core .NET Framework 
 ' to help complete your developer toolbox.
 ' It Is a set of general purpose classes provided as easy to consume packages.
 ' These utility classes and components provide productivity in day to day software development 
 ' mainly focused To WindowsForms. 
 
-' UPDATES OF ELEKTROKIT ARE MAINTAINED AND RELEASED EVERY MONTH.
+' UPDATES OF DevCase ARE MAINTAINED AND RELEASED EVERY MONTH.
 
 
 
 
 
-Namespace ElektroKit.Core.Extensions.[NameValueCollection]
+Namespace DevCase.Core.Extensions.[NameValueCollection]
 
     ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
@@ -77,7 +77,7 @@ Namespace ElektroKit.Core.Extensions.[NameValueCollection]
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>
-        Public Function ToQueryString(ByVal sender As Collections.Specialized.NameValueCollection) As String
+        Public Function ToQueryString(sender As Collections.Specialized.NameValueCollection) As String
 
             Return NameValueCollectionExtensions.ToQueryString(sender, String.Empty)
 
@@ -117,8 +117,8 @@ Namespace ElektroKit.Core.Extensions.[NameValueCollection]
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>
-        Public Function ToQueryString(ByVal sender As Collections.Specialized.NameValueCollection,
-                                      ByVal baseAddress As Uri) As String
+        Public Function ToQueryString(sender As Collections.Specialized.NameValueCollection,
+baseAddress As Uri) As String
 
             Return NameValueCollectionExtensions.ToQueryString(sender, baseAddress.AbsoluteUri)
 
@@ -158,8 +158,8 @@ Namespace ElektroKit.Core.Extensions.[NameValueCollection]
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>
-        Public Function ToQueryString(ByVal sender As Collections.Specialized.NameValueCollection,
-                                      ByVal baseAddress As String) As String
+        Public Function ToQueryString(sender As Collections.Specialized.NameValueCollection,
+baseAddress As String) As String
 
             Dim sb As New StringBuilder
             If Not String.IsNullOrWhiteSpace(baseAddress) Then

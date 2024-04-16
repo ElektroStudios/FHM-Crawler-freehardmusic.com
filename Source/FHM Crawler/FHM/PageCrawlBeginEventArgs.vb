@@ -8,7 +8,7 @@ Namespace FHM
         Private Sub New()
         End Sub
 
-        Public Sub New(ByVal pageIndex As Integer)
+        Public Sub New(pageIndex As Integer)
             Me.PageIndex = pageIndex
         End Sub
 

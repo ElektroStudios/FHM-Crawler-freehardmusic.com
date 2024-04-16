@@ -11,16 +11,16 @@ Namespace FHM
         Private Sub New()
         End Sub
 
-        Public Sub New(ByVal artist As String)
+        Public Sub New(artist As String)
             Me.Artist = artist
             Me.Genre = "all"
             Me.Country = "all"
             Me.Year = "all"
         End Sub
 
-        Public Sub New(Optional ByVal genre As String = "all",
-                       Optional ByVal country As String = "all",
-                       Optional ByVal year As String = "all")
+        Public Sub New(Optional genre As String = "all",
+                       Optional country As String = "all",
+                       Optional year As String = "all")
 
             Me.Artist = ""
             Me.Genre = genre

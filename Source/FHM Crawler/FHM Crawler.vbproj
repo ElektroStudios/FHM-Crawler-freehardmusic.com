@@ -12,8 +12,9 @@
     <AssemblyName>FHM Crawler</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsForms</MyType>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -54,6 +55,9 @@
   <PropertyGroup>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="HtmlAgilityPack">
       <HintPath>P:\Documents\Source codes\VB.NET\ElektroKit\v2.6\Solution\Bin\3rd party references\HTMLAgilityPack\HtmlAgilityPack.dll</HintPath>
@@ -84,15 +88,22 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ElektroKit\Core\Application\ComparerResult.vb" />
-    <Compile Include="ElektroKit\Core\Application\DateComparer.vb" />
-    <Compile Include="ElektroKit\Core\Application\NumericComparer.vb" />
-    <Compile Include="ElektroKit\Core\Application\StringLengthComparer.vb" />
-    <Compile Include="ElektroKit\Core\Application\TextComparer.vb" />
-    <Compile Include="ElektroKit\Core\Application\UserInterface\ListViewColumnSorter.vb" />
-    <Compile Include="ElektroKit\Core\Application\UserInterface\SortModifiers.vb" />
-    <Compile Include="ElektroKit\Core\Extensions\ListViewExtensions.vb" />
-    <Compile Include="ElektroKit\Core\Extensions\NameValueCollectionExtensions.vb" />
+    <Compile Include="CookieAwareWebClient.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DevCase\Core\Application\ComparerResult.vb" />
+    <Compile Include="DevCase\Core\Application\DateComparer.vb" />
+    <Compile Include="DevCase\Core\Application\NumericComparer.vb" />
+    <Compile Include="DevCase\Core\Application\StringLengthComparer.vb" />
+    <Compile Include="DevCase\Core\Application\TextComparer.vb" />
+    <Compile Include="DevCase\Core\Application\UserInterface\ListViewColumnSorter.vb" />
+    <Compile Include="DevCase\Core\Application\UserInterface\SortModifiers.vb" />
+    <Compile Include="DevCase\Core\Extensions\ListViewExtensions.vb" />
+    <Compile Include="DevCase\Core\Extensions\NameValueCollectionExtensions.vb" />
+    <Compile Include="DevCase\Extensions\TabControlExtensions.vb" />
+    <Compile Include="DevCase\InternetUtil.vb" />
+    <Compile Include="DevCase\Win32\InternetGetCookieExFlags.vb" />
+    <Compile Include="DevCase\Win32\NativeMethods.vb" />
     <Compile Include="FHM\AlbumInfo.vb" />
     <Compile Include="FHM\PageCrawlBeginEventArgs.vb" />
     <Compile Include="FHM\PageCrawlEndEventArgs.vb" />
@@ -110,6 +121,7 @@
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -146,6 +158,8 @@
     </None>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="app.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

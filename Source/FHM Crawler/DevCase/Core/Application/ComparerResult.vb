@@ -3,53 +3,53 @@
 
 
 
-' THIS OPEN-SOURCE APPLICATION IS POWERED BY ELEKTROKIT FRAMEWORK, CREATED BY ELEKTRO STUDIOS.
+' THIS OPEN-SOURCE APPLICATION IS POWERED BY DevCase FRAMEWORK, CREATED BY ELEKTRO STUDIOS.
 
 ' WHAT YOU SEE HERE IS FREE CUTTED CONTENT OF THIS FRAMEWORK.
 
-' IF YOU LIKED THIS FREE APPLICATION, THEN PLEASE CONSIDER TO BUY ELEKTROKIT FRAMEWORK FOR .NET AT:
-' https://codecanyon.net/item/elektrokit-class-library-for-net/19260282
+' IF YOU LIKED THIS FREE APPLICATION, THEN PLEASE CONSIDER TO BUY DevCase FRAMEWORK FOR .NET AT:
+' https://codecanyon.net/item/DevCase-class-library-for-net/19260282
 
 ' YOU CAN FIND THESE HELPER METHODS AND A MASSIVE AMOUNT MORE!, 
 ' +850 EXTENSION METHODS FOR ALL KIND OF TYPES, CUSTOM USER-CONTROLS, 
 ' EVERYTHING FOR THE NEWBIE And THE ADVANCED USER, FOR VB.NET AND C#. 
 
-' ElektroKit is a utility framework containing new APIs and extensions to the core .NET Framework 
+' DevCase is a utility framework containing new APIs and extensions to the core .NET Framework 
 ' to help complete your developer toolbox.
 ' It Is a set of general purpose classes provided as easy to consume packages.
 ' These utility classes and components provide productivity in day to day software development 
 ' mainly focused To WindowsForms. 
 
-' UPDATES OF ELEKTROKIT ARE MAINTAINED AND RELEASED EVERY MONTH.
+' UPDATES OF DevCase ARE MAINTAINED AND RELEASED EVERY MONTH.
 
 
 
 
-#Region " Sort Modifiers "
+#Region " Comparer Result "
 
-Namespace ElektroKit.Core.Application.UserInterface.Enums
+Namespace DevCase.Core.Application.Enums
 
     ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
-    ''' Specifies a Sorting Modifier.
+    ''' Specifies a comparison result.
     ''' </summary>
     ''' ----------------------------------------------------------------------------------------------------
-    Public Enum SortModifiers As Integer
+    Public Enum ComparerResult As Integer
 
         ''' <summary>
-        ''' Treats the values ​​as text.
+        ''' 'A' is equals to 'B'.
         ''' </summary>
-        SortByText = 0
+        Equals = 0
 
         ''' <summary>
-        ''' Treats the values ​​as numbers.
+        ''' 'A' is less than 'B'.
         ''' </summary>
-        SortByNumber = 1
+        LessThan = -1
 
         ''' <summary>
-        ''' Treats valuesthe values ​​as dates.
+        ''' 'A' is greater than 'B'.
         ''' </summary>
-        SortByDate = 2
+        GreaterThan = 1
 
     End Enum
 

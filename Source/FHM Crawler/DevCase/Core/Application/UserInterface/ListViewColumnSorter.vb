@@ -3,39 +3,39 @@
 
 
 
-' THIS OPEN-SOURCE APPLICATION IS POWERED BY ELEKTROKIT FRAMEWORK, CREATED BY ELEKTRO STUDIOS.
+' THIS OPEN-SOURCE APPLICATION IS POWERED BY DevCase FRAMEWORK, CREATED BY ELEKTRO STUDIOS.
 
 ' WHAT YOU SEE HERE IS FREE CUTTED CONTENT OF THIS FRAMEWORK.
 
-' IF YOU LIKED THIS FREE APPLICATION, THEN PLEASE CONSIDER TO BUY ELEKTROKIT FRAMEWORK FOR .NET AT:
-' https://codecanyon.net/item/elektrokit-class-library-for-net/19260282
+' IF YOU LIKED THIS FREE APPLICATION, THEN PLEASE CONSIDER TO BUY DevCase FRAMEWORK FOR .NET AT:
+' https://codecanyon.net/item/DevCase-class-library-for-net/19260282
 
 ' YOU CAN FIND THESE HELPER METHODS AND A MASSIVE AMOUNT MORE!, 
 ' +850 EXTENSION METHODS FOR ALL KIND OF TYPES, CUSTOM USER-CONTROLS, 
 ' EVERYTHING FOR THE NEWBIE And THE ADVANCED USER, FOR VB.NET AND C#. 
 
-' ElektroKit is a utility framework containing new APIs and extensions to the core .NET Framework 
+' DevCase is a utility framework containing new APIs and extensions to the core .NET Framework 
 ' to help complete your developer toolbox.
 ' It Is a set of general purpose classes provided as easy to consume packages.
 ' These utility classes and components provide productivity in day to day software development 
 ' mainly focused To WindowsForms. 
 
-' UPDATES OF ELEKTROKIT ARE MAINTAINED AND RELEASED EVERY MONTH.
+' UPDATES OF DevCase ARE MAINTAINED AND RELEASED EVERY MONTH.
 
 
 
 
 #Region " Imports "
 
-Imports ElektroKit.Core.Application.Enums
-Imports ElektroKit.Core.Application.Types
-Imports ElektroKit.Core.Application.UserInterface.Enums
+Imports DevCase.Core.Application.Enums
+Imports DevCase.Core.Application.Types
+Imports DevCase.Core.Application.UserInterface.Enums
 
 #End Region
 
 #Region " ListView's Column Sorter "
 
-Namespace ElektroKit.Core.Application.UserInterface.Types
+Namespace DevCase.Core.Application.UserInterface.Types
 
     ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
@@ -177,7 +177,7 @@ Namespace ElektroKit.Core.Application.UserInterface.Types
                 Return Me.columnIndexB
             End Get
             <DebuggerStepThrough>
-            Set(ByVal value As Integer)
+            Set(value As Integer)
                 Me.columnIndexB = value
             End Set
         End Property
@@ -204,7 +204,7 @@ Namespace ElektroKit.Core.Application.UserInterface.Types
                 Return Me.orderB
             End Get
             <DebuggerStepThrough>
-            Set(ByVal value As SortOrder)
+            Set(value As SortOrder)
                 Me.orderB = value
             End Set
         End Property
@@ -231,7 +231,7 @@ Namespace ElektroKit.Core.Application.UserInterface.Types
                 Return Me.sortModifierB
             End Get
             <DebuggerStepThrough>
-            Set(ByVal value As SortModifiers)
+            Set(value As SortModifiers)
                 Me.sortModifierB = value
             End Set
         End Property
@@ -290,7 +290,7 @@ Namespace ElektroKit.Core.Application.UserInterface.Types
         ''' </returns>
         ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
-        Public Function Compare(ByVal a As Object, ByVal b As Object) As Integer Implements IComparer.Compare
+        Public Function Compare(a As Object, b As Object) As Integer Implements IComparer.Compare
 
             Dim compareResult As ComparerResult = ComparerResult.Equals
             Dim lvItemA As ListViewItem
