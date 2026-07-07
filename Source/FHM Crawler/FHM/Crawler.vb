@@ -13,6 +13,10 @@ Imports HtmlNode = HtmlAgilityPack.HtmlNode
 Imports HtmlNodeCollection = HtmlAgilityPack.HtmlNodeCollection
 
 Imports DevCase.Core.Extensions.NameValueCollection
+Imports System.Threading.Tasks
+Imports System.Collections.Generic
+Imports System.Xml.Linq
+Imports System.Linq
 
 #End Region
 

@@ -10,10 +10,10 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("FHM Crawler")>
-<Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("Elektro Studios")>
+<Assembly: AssemblyDescription("A desktop application to crawl albums from the FHM website.")>
+<Assembly: AssemblyCompany("ElektroStudios")>
 <Assembly: AssemblyProduct("FHM Crawler")>
-<Assembly: AssemblyCopyright("Copyright © Elektro Studios 2018-2024")>
+<Assembly: AssemblyCopyright("Copyright © ElektroStudios 2018-2026")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
@@ -32,6 +32,6 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")>
 
-<Assembly: AssemblyVersion("1.1.0.0")>
-<Assembly: AssemblyFileVersion("1.1.0.0")>
+<Assembly: AssemblyVersion("1.2.0.0")>
+<Assembly: AssemblyFileVersion("1.2.0.0")>
 <Assembly: NeutralResourcesLanguage("en")>

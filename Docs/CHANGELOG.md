@@ -1,6 +1,12 @@
-# FHM Crawler (http://freehardmusic.com/) Change Log 📋
+﻿# FHM Crawler (http://freehardmusic.com/) Change Log 📋
 
-## v1.1 *(current)* 🆕
+## v1.2.0 *(current)* 🆕
+
+#### 🛠️ Fixes:
+ - Resolved an authentication error preventing successful log-in access to the FHM website.
+ - Resolved an issue where the year list was capped at 2018, preventing the retrieval of content from recent years.
+
+## v1.1 🔄
 
 #### 🛠️ Fixes:
  - The program has stopped working due breaking changes on the FHM server. Crawler logic has been updated.

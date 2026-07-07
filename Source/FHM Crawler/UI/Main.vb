@@ -5,9 +5,10 @@ Imports FHM
 Imports DevCase.Core.Application.UserInterface.Types
 Imports DevCase.Core.Application.UserInterface.Enums
 Imports DevCase.Core.Extensions.ListView
-Imports DevCase.Core.Net
 
-Public Class Main
+Imports System.Diagnostics
+
+Public Class Main : Inherits System.Windows.Forms.Form
 
     Private WithEvents FHMCrawler As Crawler
     Private sorter As New ListViewColumnSorter
@@ -29,6 +30,8 @@ Public Class Main
 #Region " Event Handlers "
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Text = $"{My.Application.Info.Title} {My.Application.Info.Version.ToString(fieldCount:=3)} — by {My.Application.Info.CompanyName}"
+
         Me.ComboBox_Country.DataSource = DataSources.countries
         Me.ComboBox_Genre.DataSource = DataSources.genres
         Me.ComboBox_Year.DataSource = DataSources.years
@@ -42,79 +45,129 @@ Public Class Main
         Me.WebBrowser1.Navigate("http://freehardmusic.com/")
     End Sub
 
-    Private Async Sub Button_FetchAlbums_Click(sender As Object, e As EventArgs) Handles Button_FetchAlbums.Click
+    Private Async Sub Button_FetchAlbums_Click(ByVal sender As Object, ByVal e As EventArgs) Handles Button_FetchAlbums.Click
 
-        If Me.RadioButton_ArtistSearch.Checked AndAlso String.IsNullOrWhiteSpace(Me.TextBoxArtist.Text) Then
-            MessageBox.Show(Me, "Artist TextBox is empty.",
+        Try
+            If Me.RadioButton_ArtistSearch.Checked AndAlso String.IsNullOrWhiteSpace(Me.TextBoxArtist.Text) Then
+                MessageBox.Show(Me, "Artist TextBox is empty.",
                                 My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
-
-            Exit Sub
-        End If
-
-        Me.cookies = InternetUtil.GetCookieContainer(New Uri("http://freehardmusic.com/"))
-        If Me.cookies Is Nothing Then
-            MessageBox.Show(Me, "Session cookies for FHM website not found." & Environment.NewLine & Environment.NewLine &
-                                $"Please select the '{Me.TabPageBrowser.Text}' tab to log in, then try again.",
-                                My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Exit Sub
-        End If
-
-        Dim userNameFound As Boolean
-        For Each c As Cookie In Me.cookies.GetCookies(New Uri("http://freehardmusic.com/"))
-            If c.Expired Then
-                MessageBox.Show(Me, "Session cookies for FHM website has expired." & Environment.NewLine & Environment.NewLine &
-                                    $"Please select the '{Me.TabPageBrowser.Text}' tab to log in, then try again.",
-                                    My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
                 Exit Sub
             End If
 
-            If c.Name.Equals("jalUserName") Then
-                userNameFound = True
+            Dim currentUri As Uri = Me.WebBrowser1.Url
+
+            If currentUri Is Nothing Then
+                MessageBox.Show(Me, "Browser has no valid URL.",
+                                My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
             End If
-        Next c
 
-        If Not userNameFound Then
-            MessageBox.Show(Me, "Username cookie for FHM website not found." & Environment.NewLine & Environment.NewLine &
-                                    $"Please select the '{Me.TabPageBrowser.Text}' tab to log in, then try again.",
+            Dim rawCookies As String = String.Empty
+            If Me.WebBrowser1.Document IsNot Nothing AndAlso Not String.IsNullOrEmpty(Me.WebBrowser1.Document.Cookie) Then
+                rawCookies = Me.WebBrowser1.Document.Cookie
+            End If
+
+            If String.IsNullOrWhiteSpace(rawCookies) Then
+                MessageBox.Show(Me, $"Session cookies for FHM website not found in the browser DOM.{Environment.NewLine}{Environment.NewLine}Please select the '{Me.TabPageBrowser.Text}' tab to log in, then try again.",
+                                My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
+            End If
+
+            Me.cookies = New CookieContainer()
+            Dim cookiePairs As String() = rawCookies.Split(";"c)
+            Dim extractedUserName As String = String.Empty
+
+            For Each pair As String In cookiePairs
+                Dim parts As String() = pair.Trim().Split(New Char() {"="c}, 2)
+
+                If parts.Length = 2 Then
+                    Dim cookieName As String = parts(0).Trim()
+                    Dim cookieValue As String = parts(1).Trim()
+
+                    Dim currentCookie As New Cookie(cookieName, cookieValue) With {
+                        .Domain = currentUri.Host
+                    }
+                    Me.cookies.Add(currentCookie)
+
+                    If cookieName.Equals("referrerid", StringComparison.OrdinalIgnoreCase) Then
+                        extractedUserName = If(cookieValue.StartsWith("RS-", StringComparison.OrdinalIgnoreCase), cookieValue.Substring(3).ToLower(), cookieValue.ToLower())
+                    End If
+                End If
+            Next
+
+            If String.IsNullOrWhiteSpace(extractedUserName) Then
+                MessageBox.Show(Me, $"Could not dynamically extract the username from the active session.{Environment.NewLine}{Environment.NewLine}Please ensure you are fully logged in.",
+                                My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
+            End If
+
+            Dim usernameCookie As New Cookie("jalUserName", extractedUserName) With {
+                .Domain = currentUri.Host
+            }
+            Me.cookies.Add(usernameCookie)
+
+            Dim sessionFound As Boolean = False
+            Dim cookieCollection As CookieCollection = Me.cookies.GetCookies(currentUri)
+
+            For Each c As Cookie In cookieCollection
+                If c.Expired Then
+                    MessageBox.Show(Me, $"Session cookies for FHM website have expired.{Environment.NewLine}{Environment.NewLine}Please select the '{Me.TabPageBrowser.Text}' tab to log in, then try again.",
                                     My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Exit Sub
-        End If
+                    Exit Sub
+                End If
 
-        If Me.FHMCrawler Is Nothing Then
-            Me.FHMCrawler = New Crawler(Me.cookies)
-        End If
+                If c.Name.Length = 32 Then
+                    sessionFound = True
+                End If
+            Next c
 
-        If (Me.GroupBox_ArtistSearch.Enabled) Then
-            With Me.FHMCrawler.SearchFilter
-                .Artist = Me.TextBoxArtist.Text
-                .Country = "all"
-                .Genre = "all"
-                .Year = "all"
-            End With
+            If Not sessionFound Then
+                MessageBox.Show(Me, $"Authentication session cookies not found.{Environment.NewLine}{Environment.NewLine}Please select the '{Me.TabPageBrowser.Text}' tab to log in, then try again.",
+                                My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
+            End If
 
-        Else
-            With Me.FHMCrawler.SearchFilter
-                .Artist = ""
-                .Country = Me.ComboBox_Country.Text
-                .Genre = Me.ComboBox_Genre.Text
-                .Year = Me.ComboBox_Year.Text
-            End With
+            If Me.FHMCrawler Is Nothing Then
+                Me.FHMCrawler = New Crawler(Me.cookies)
+            End If
 
-        End If
+            If Me.GroupBox_ArtistSearch.Enabled Then
+                With Me.FHMCrawler.SearchFilter
+                    .Artist = Me.TextBoxArtist.Text
+                    .Country = "all"
+                    .Genre = "all"
+                    .Year = "all"
+                End With
+            Else
+                With Me.FHMCrawler.SearchFilter
+                    .Artist = String.Empty
+                    .Country = Me.ComboBox_Country.Text
+                    .Genre = Me.ComboBox_Genre.Text
+                    .Year = Me.ComboBox_Year.Text
+                End With
+            End If
 
-        Me.DisableControls()
+            Me.DisableControls()
 
-        Me.Label_AlbumCount.Text = "Searching albums..."
-        Me.Label_Debug.Text = "FHM website is very slow. Please wait..."
-        Me.albumCount = Await Me.FHMCrawler.GetAlbumCountAsync()
-        Me.ProgressBar1.Maximum = Me.albumCount
-        Me.ProgressBar1.Step = 10 ' 10 albums per page.
-        Me.Button_Cancel.Enabled = True
-        Me.Label_AlbumCount.Text = String.Format("Fetching {0} albums...", Me.albumCount)
+            Me.Label_AlbumCount.Text = "Searching albums..."
+            Me.Label_Debug.Text = "FHM website is very slow. Please wait..."
 
-        Await Me.FHMCrawler.FetchAlbumsAsync()
+            Me.albumCount = Await Me.FHMCrawler.GetAlbumCountAsync()
 
-        Me.EnableControls()
+            Me.ProgressBar1.Maximum = Me.albumCount
+            Me.ProgressBar1.Step = 10
+            Me.Button_Cancel.Enabled = True
+            Me.Label_AlbumCount.Text = $"Fetching {Me.albumCount} albums..."
+
+            Await Me.FHMCrawler.FetchAlbumsAsync()
+
+            Me.EnableControls()
+
+        Catch ex As Exception
+            MessageBox.Show(Me, $"An unexpected error occurred during the album fetching process:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Me.EnableControls()
+        End Try
 
     End Sub
 

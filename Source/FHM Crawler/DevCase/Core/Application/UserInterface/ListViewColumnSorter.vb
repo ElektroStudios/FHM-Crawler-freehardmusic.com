@@ -27,6 +27,9 @@
 
 #Region " Imports "
 
+Imports System.Collections
+Imports System.Diagnostics
+
 Imports DevCase.Core.Application.Enums
 Imports DevCase.Core.Application.Types
 Imports DevCase.Core.Application.UserInterface.Enums
@@ -172,22 +175,6 @@ Namespace DevCase.Core.Application.UserInterface.Types
         ''' </value>
         ''' ----------------------------------------------------------------------------------------------------
         Public Property ColumnIndex As Integer
-            <DebuggerStepThrough>
-            Get
-                Return Me.columnIndexB
-            End Get
-            <DebuggerStepThrough>
-            Set(value As Integer)
-                Me.columnIndexB = value
-            End Set
-        End Property
-        ''' ----------------------------------------------------------------------------------------------------
-        ''' <summary>
-        ''' ( Backing field )
-        ''' The index of the column to which to apply the sorting operation (default index is <c>0</c>).
-        ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
-        Private columnIndexB As Integer
 
         ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
@@ -199,22 +186,6 @@ Namespace DevCase.Core.Application.UserInterface.Types
         ''' </value>
         ''' ----------------------------------------------------------------------------------------------------
         Public Property Order As SortOrder
-            <DebuggerStepThrough>
-            Get
-                Return Me.orderB
-            End Get
-            <DebuggerStepThrough>
-            Set(value As SortOrder)
-                Me.orderB = value
-            End Set
-        End Property
-        ''' ----------------------------------------------------------------------------------------------------
-        ''' <summary>
-        ''' ( Backing field )
-        ''' The order of sorting to apply.
-        ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
-        Private orderB As SortOrder
 
         ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
@@ -226,22 +197,6 @@ Namespace DevCase.Core.Application.UserInterface.Types
         ''' </value>
         ''' ----------------------------------------------------------------------------------------------------
         Public Property SortModifier As SortModifiers
-            <DebuggerStepThrough>
-            Get
-                Return Me.sortModifierB
-            End Get
-            <DebuggerStepThrough>
-            Set(value As SortModifiers)
-                Me.sortModifierB = value
-            End Set
-        End Property
-        ''' ----------------------------------------------------------------------------------------------------
-        ''' <summary>
-        ''' ( Backing field )
-        ''' The sort modifier.
-        ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
-        Private sortModifierB As SortModifiers
 
 #End Region
 
@@ -256,9 +211,9 @@ Namespace DevCase.Core.Application.UserInterface.Types
         Public Sub New()
 
             Me.comparer = New TextComparer
-            Me.columnIndexB = 0
-            Me.orderB = SortOrder.None
-            Me.sortModifierB = SortModifiers.SortByText
+            Me.ColumnIndex = 0
+            Me.Order = SortOrder.None
+            Me.SortModifier = SortModifiers.SortByText
 
         End Sub
 
@@ -292,7 +247,7 @@ Namespace DevCase.Core.Application.UserInterface.Types
         <DebuggerStepThrough>
         Public Function Compare(a As Object, b As Object) As Integer Implements IComparer.Compare
 
-            Dim compareResult As ComparerResult = ComparerResult.Equals
+            Dim compareResult As ComparerResult
             Dim lvItemA As ListViewItem
             Dim lvItemB As ListViewItem
 
@@ -300,12 +255,12 @@ Namespace DevCase.Core.Application.UserInterface.Types
             lvItemA = DirectCast(a, ListViewItem)
             lvItemB = DirectCast(b, ListViewItem)
 
-            Dim strA As String = If(Not lvItemA.SubItems.Count <= Me.columnIndexB,
-                                    lvItemA.SubItems(Me.columnIndexB).Text,
+            Dim strA As String = If(Not lvItemA.SubItems.Count <= Me.ColumnIndex,
+                                    lvItemA.SubItems(Me.ColumnIndex).Text,
                                     Nothing)
 
-            Dim strB As String = If(Not lvItemB.SubItems.Count <= Me.columnIndexB,
-                                    lvItemB.SubItems(Me.columnIndexB).Text,
+            Dim strB As String = If(Not lvItemB.SubItems.Count <= Me.ColumnIndex,
+                                    lvItemB.SubItems(Me.ColumnIndex).Text,
                                     Nothing)
 
             Dim listViewMain As ListView = lvItemA.ListView
@@ -318,16 +273,16 @@ Namespace DevCase.Core.Application.UserInterface.Types
 
             End If
 
-            If Me.sortModifierB.Equals(SortModifiers.SortByText) Then
+            If Me.SortModifier.Equals(SortModifiers.SortByText) Then
 
                 ' Compare the two items
-                If lvItemA.SubItems.Count <= Me.columnIndexB AndAlso lvItemB.SubItems.Count <= Me.columnIndexB Then
+                If lvItemA.SubItems.Count <= Me.ColumnIndex AndAlso lvItemB.SubItems.Count <= Me.ColumnIndex Then
                     compareResult = DirectCast(Me.comparer.Compare(Nothing, Nothing), ComparerResult)
 
-                ElseIf lvItemA.SubItems.Count <= Me.columnIndexB AndAlso lvItemB.SubItems.Count > Me.columnIndexB Then
+                ElseIf lvItemA.SubItems.Count <= Me.ColumnIndex AndAlso lvItemB.SubItems.Count > Me.ColumnIndex Then
                     compareResult = DirectCast(Me.comparer.Compare(Nothing, strB), ComparerResult)
 
-                ElseIf lvItemA.SubItems.Count > Me.columnIndexB AndAlso lvItemB.SubItems.Count <= Me.columnIndexB Then
+                ElseIf lvItemA.SubItems.Count > Me.ColumnIndex AndAlso lvItemB.SubItems.Count <= Me.ColumnIndex Then
                     compareResult = DirectCast(Me.comparer.Compare(strA, Nothing), ComparerResult)
 
                 Else
@@ -337,7 +292,7 @@ Namespace DevCase.Core.Application.UserInterface.Types
 
             Else ' Me.sortModifierB IsNot SortModifiers.SortByText.
 
-                Select Case Me.sortModifierB
+                Select Case Me.SortModifier
 
                     Case SortModifiers.SortByNumber
                         If Me.comparer.GetType <> GetType(NumericComparer) Then
@@ -361,13 +316,13 @@ Namespace DevCase.Core.Application.UserInterface.Types
             End If ' Me.sortModifierB.Equals(...)
 
             ' Calculate the proper return value based on object comparison.
-            If Me.orderB = SortOrder.Ascending Then
+            If Me.Order = SortOrder.Ascending Then
                 ' Ascending sort is selected, return normal result of the comparison operation.
                 Return compareResult
 
-            ElseIf Me.orderB = SortOrder.Descending Then
+            ElseIf Me.Order = SortOrder.Descending Then
                 ' Descending sort is selected, return negative result of the comparison operation.
-                Return -CInt(compareResult)
+                Return -compareResult
 
             Else
                 ' Return '0' to indicate they are equal.

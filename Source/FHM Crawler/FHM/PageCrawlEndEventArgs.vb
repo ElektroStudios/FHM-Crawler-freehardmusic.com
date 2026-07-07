@@ -1,4 +1,6 @@
 ﻿
+Imports System.Collections.Generic
+
 Namespace FHM
 
     Public NotInheritable Class PageCrawlEndEventArgs : Inherits EventArgs

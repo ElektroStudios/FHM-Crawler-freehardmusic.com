@@ -1,6 +1,7 @@
 ﻿#Region " Imports "
 
 Imports System.ComponentModel
+Imports System.Diagnostics
 Imports System.Runtime.CompilerServices
 Imports System.Text
 Imports System.Web
@@ -158,8 +159,7 @@ baseAddress As Uri) As String
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>
-        Public Function ToQueryString(sender As Collections.Specialized.NameValueCollection,
-baseAddress As String) As String
+        Public Function ToQueryString(sender As Collections.Specialized.NameValueCollection, baseAddress As String) As String
 
             Dim sb As New StringBuilder
             If Not String.IsNullOrWhiteSpace(baseAddress) Then

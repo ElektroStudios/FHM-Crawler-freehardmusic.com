@@ -28,6 +28,8 @@
 #Region " Imports "
 
 Imports System.ComponentModel
+Imports System.Diagnostics
+Imports System.Linq
 Imports System.Runtime.CompilerServices
 Imports System.Text
 Imports System.Windows.Forms.ListViewItem

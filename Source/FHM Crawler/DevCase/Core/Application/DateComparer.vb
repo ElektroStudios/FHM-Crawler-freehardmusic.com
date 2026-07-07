@@ -27,6 +27,9 @@
 
 #Region " Imports "
 
+Imports System.Collections
+Imports System.Diagnostics
+
 Imports DevCase.Core.Application.Enums
 
 #End Region
@@ -98,8 +101,8 @@ Namespace DevCase.Core.Application.Types
                 Return ComparerResult.GreaterThan ' A is greater than B.
 
             Else
-                Dim dateA As DateTime
-                Dim dateB As DateTime
+                Dim dateA As Date
+                Dim dateB As Date
 
                 If (Date.TryParse(CStr(a), dateA)) AndAlso (Date.TryParse(CStr(b), dateB)) Then ' True And True.
                     Return DirectCast(dateA.CompareTo(dateB), ComparerResult)

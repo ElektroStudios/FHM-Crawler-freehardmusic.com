@@ -396,7 +396,7 @@ Partial Class Main
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "Main"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "FHM Crawler - Demo by Elektro"
+        Me.Text = "FHM Crawler"
         Me.GroupBox_ArtistSearch.ResumeLayout(False)
         Me.GroupBox_ArtistSearch.PerformLayout()
         Me.GroupBox_CustomSearch.ResumeLayout(False)

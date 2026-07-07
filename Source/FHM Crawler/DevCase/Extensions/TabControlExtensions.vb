@@ -1,4 +1,7 @@
-﻿Imports System.Runtime.CompilerServices
+﻿Imports System.Collections.Generic
+Imports System.Diagnostics
+Imports System.Linq
+Imports System.Runtime.CompilerServices
 
 ''' <summary>
 ''' Provides method extensions for a <see cref="TabControl"/> control.
