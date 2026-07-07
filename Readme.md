@@ -43,11 +43,11 @@ winforms
     <a href="https://github.com/ElektroStudios/FHM-Crawler-freehardmusic.com/releases/latest"><img src="https://img.shields.io/github/v/release/ElektroStudios/FHM-Crawler-freehardmusic.com" alt="Latest Release"></a>
     <a href="https://learn.microsoft.com/en-us/dotnet/visual-basic/"><img src="https://img.shields.io/badge/language-VB.NET-purple.svg?logo=visualbasic" alt="Language"></a>
     <a href="https://learn.microsoft.com/en-us/windows/apps/"><img src="https://img.shields.io/badge/platform-Windows-lightgray.svg" alt="Platform"></a>
-    <a href="License.md"><img src="https://img.shields.io/github/license/ElektroStudios/FHM-Crawler-freehardmusic.com" alt="License"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/github/license/ElektroStudios/FHM-Crawler-freehardmusic.com" alt="License"></a>
   <br>
-    <a href="https://github.com/ElektroStudios/FHM-Crawler-freehardmusic.com/archive/refs/heads/main.zip"><img src="https://img.shields.io/github/repo-size/ElektroStudios/FHM-Crawler-freehardmusic.com" alt="Repo size"></a>
+    <a href="https://api.github.com/repos/ElektroStudios/FHM-Crawler-freehardmusic.com/zipball"><img src="https://img.shields.io/github/repo-size/ElektroStudios/FHM-Crawler-freehardmusic.com" alt="Repo size"></a>
     <a href="https://somsubhra.github.io/github-release-stats/?username=ElektroStudios&repository=FHM-Crawler-freehardmusic.com"><img src="https://img.shields.io/github/downloads/ElektroStudios/FHM-Crawler-freehardmusic.com/total.svg?label=total%20downloads" alt="Total Downloads"></a>
-    <a href="https://github.com/ElektroStudios/FHM-Crawler-freehardmusic.com/commits/main"><img src="https://img.shields.io/github/last-commit/ElektroStudios/FHM-Crawler-freehardmusic.com" alt="Last commit"></a>
+    <a href="https://github.com/ElektroStudios/FHM-Crawler-freehardmusic.com/commits"><img src="https://img.shields.io/github/last-commit/ElektroStudios/FHM-Crawler-freehardmusic.com" alt="Last commit"></a>
     <a href="https://github.com/ElektroStudios/FHM-Crawler-freehardmusic.com/pulls"><img src="https://img.shields.io/github/issues-pr/ElektroStudios/FHM-Crawler-freehardmusic.com" alt="Pull Requests"></a>
     <a href="https://github.com/ElektroStudios/FHM-Crawler-freehardmusic.com/issues?q=is%3Aissue+is%3Aopen"><img src="https://img.shields.io/github/issues/ElektroStudios/FHM-Crawler-freehardmusic.com?color=blue" alt="Open Issues"></a><a href="https://github.com/ElektroStudios/FHM-Crawler-freehardmusic.com/issues?q=is%3Aissue+is%3Aclosed"><img src="https://img.shields.io/github/issues-closed/ElektroStudios/FHM-Crawler-freehardmusic.com?label=&color=28a745" alt="Closed Issues"></a>
     <a href="https://github.com/ElektroStudios/FHM-Crawler-freehardmusic.com/pulse"><img src="https://img.shields.io/badge/maintained-yes-green.svg" alt="Maintenance"></a>
