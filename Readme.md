@@ -61,11 +61,9 @@ winforms
 ## 🖼️ Screenshots
 
 <div align="center">
-  <img src="/Images/FHM%20Crawler%201.png" width="48%" alt="Screenshot 1">
+  <img src="/Images/FHM%20Crawler%201.png" width="32%" alt="Screenshot 1">&nbsp;<img src="/Images/FHM%20Crawler%201.1.png" width="32%" alt="Screenshot 1.1">&nbsp;<img src="/Images/FHM%20Crawler%202.png" width="32%" alt="Screenshot 2">
   <br>
-  <img src="/Images/FHM%20Crawler%201.1.png" width="48%" alt="Screenshot 1.1">&nbsp;<img src="/Images/FHM%20Crawler%202.png" width="48%" alt="Screenshot 2">
-  <br>
-  <img src="/Images/FHM%20Crawler%203.png" width="90%" alt="Screenshot 3">
+  <img src="/Images/FHM%20Crawler%203.png" width="98%" alt="Screenshot 3">
 </div>
 
 ## 🎦 Videos
