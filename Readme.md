@@ -58,6 +58,17 @@ winforms
 
 ------------------
 
+## 👋 Introduction
+
+**FHM Crawler** is a desktop automation utility designed to systematically browse and extract album URLs from [freehardmusic.com](http://freehardmusic.com/), providing a fast, automated way to gather data that would otherwise require hours of manual navigation. It is built for users who need to compile extensive lists of media links without the hassle of clicking through countless pages.
+
+## 💡 Motivation
+
+Browsing through large media repositories on websites like FHM is a grind. When you need to extract specific URL patterns from hundreds of pages, manual scraping is an inefficient waste of time. I built this tool to automate the process—it handles the recursive page navigation, filters the target data, and compiles the result into a clean list, allowing you to focus on the content instead of the navigation.
+
+##### ⚡ The Real Question
+###### Why spend your time manually clicking and copying links from a massive library when you can have a purpose-built crawler parse the entire site and extract the data you need in minutes?.
+
 ## 🖼️ Screenshots
 
 <div align="center">
