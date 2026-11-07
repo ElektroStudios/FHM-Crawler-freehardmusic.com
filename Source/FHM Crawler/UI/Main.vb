@@ -257,7 +257,10 @@ Public Class Main : Inherits System.Windows.Forms.Form
             Me.ListView_Albums.Items.Add(lvItem)
         Next albumInfo
         Me.ListView_Albums.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent)
-        Me.ListView_Albums.EnsureVisible(Me.ListView_Albums.Items.Count - 1)
+        ' A page can yield no albums (e.g. all its albums lacked download links); EnsureVisible(-1) would throw.
+        If Me.ListView_Albums.Items.Count > 0 Then
+            Me.ListView_Albums.EnsureVisible(Me.ListView_Albums.Items.Count - 1)
+        End If
         Me.ListView_Albums.EndUpdate()
 
         Me.ProgressBar1.PerformStep()

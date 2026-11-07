@@ -161,6 +161,10 @@ baseAddress As Uri) As String
         <EditorBrowsable(EditorBrowsableState.Always)>
         Public Function ToQueryString(sender As Collections.Specialized.NameValueCollection, baseAddress As String) As String
 
+            If sender Is Nothing Then
+                Throw New ArgumentNullException(paramName:=NameOf(sender))
+            End If
+
             Dim sb As New StringBuilder
             If Not String.IsNullOrWhiteSpace(baseAddress) Then
                 sb.Append(baseAddress.TrimEnd({"?"c}))
@@ -171,7 +175,14 @@ baseAddress As Uri) As String
                 sb.AppendFormat("{0}={1}&", key, HttpUtility.UrlEncode(sender(key)))
             Next
 
-            Return sb.Remove((sb.Length - 1), 1).ToString() ' removes the last "&" char.
+            ' Removes the trailing "&" char (or the trailing "?" char when the collection is empty).
+            ' NOTE: An empty collection without base address produces an empty StringBuilder,
+            ' so the length must be checked to avoid an ArgumentOutOfRangeException.
+            If sb.Length > 0 Then
+                sb.Remove((sb.Length - 1), 1)
+            End If
+
+            Return sb.ToString()
 
         End Function
 

@@ -273,47 +273,31 @@ Namespace DevCase.Core.Application.UserInterface.Types
 
             End If
 
-            If Me.SortModifier.Equals(SortModifiers.SortByText) Then
+            ' Ensure the comparer matches the current sort modifier.
+            ' NOTE: The comparer must be refreshed for every sort modifier (SortByText included); otherwise,
+            ' after sorting a numeric/date column, text columns would keep being sorted with the previous comparer.
+            Select Case Me.SortModifier
 
-                ' Compare the two items
-                If lvItemA.SubItems.Count <= Me.ColumnIndex AndAlso lvItemB.SubItems.Count <= Me.ColumnIndex Then
-                    compareResult = DirectCast(Me.comparer.Compare(Nothing, Nothing), ComparerResult)
+                Case SortModifiers.SortByNumber
+                    If Me.comparer.GetType() <> GetType(NumericComparer) Then
+                        Me.comparer = New NumericComparer()
+                    End If
 
-                ElseIf lvItemA.SubItems.Count <= Me.ColumnIndex AndAlso lvItemB.SubItems.Count > Me.ColumnIndex Then
-                    compareResult = DirectCast(Me.comparer.Compare(Nothing, strB), ComparerResult)
+                Case SortModifiers.SortByDate
+                    If Me.comparer.GetType() <> GetType(DateComparer) Then
+                        Me.comparer = New DateComparer()
+                    End If
 
-                ElseIf lvItemA.SubItems.Count > Me.ColumnIndex AndAlso lvItemB.SubItems.Count <= Me.ColumnIndex Then
-                    compareResult = DirectCast(Me.comparer.Compare(strA, Nothing), ComparerResult)
+                Case Else
+                    If Me.comparer.GetType() <> GetType(TextComparer) Then
+                        Me.comparer = New TextComparer()
+                    End If
 
-                Else
-                    compareResult = DirectCast(Me.comparer.Compare(strA, strB), ComparerResult)
+            End Select
 
-                End If
-
-            Else ' Me.sortModifierB IsNot SortModifiers.SortByText.
-
-                Select Case Me.SortModifier
-
-                    Case SortModifiers.SortByNumber
-                        If Me.comparer.GetType <> GetType(NumericComparer) Then
-                            Me.comparer = New NumericComparer
-                        End If
-
-                    Case SortModifiers.SortByDate
-                        If Me.comparer.GetType <> GetType(DateComparer) Then
-                            Me.comparer = New DateComparer
-                        End If
-
-                    Case Else
-                        If Me.comparer.GetType <> GetType(TextComparer) Then
-                            Me.comparer = New TextComparer
-                        End If
-
-                End Select
-
-                compareResult = DirectCast(Me.comparer.Compare(strA, strB), ComparerResult)
-
-            End If ' Me.sortModifierB.Equals(...)
+            ' Compare the two items.
+            ' A missing sub-item is compared as Nothing (all the comparers sort Nothing before any value).
+            compareResult = DirectCast(Me.comparer.Compare(strA, strB), ComparerResult)
 
             ' Calculate the proper return value based on object comparison.
             If Me.Order = SortOrder.Ascending Then

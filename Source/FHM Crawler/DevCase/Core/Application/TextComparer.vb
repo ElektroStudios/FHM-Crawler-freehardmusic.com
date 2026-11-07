@@ -44,7 +44,11 @@ Namespace DevCase.Core.Application.Types
     ''' Performs a comparison between two string values.
     ''' </summary>
     ''' ----------------------------------------------------------------------------------------------------
-    Public NotInheritable Class TextComparer : Inherits CaseInsensitiveComparer
+    Public NotInheritable Class TextComparer : Inherits CaseInsensitiveComparer : Implements IComparer
+
+        ' NOTE: IComparer is re-implemented so that callers using an IComparer reference
+        ' (e.g. ListViewColumnSorter) invoke the custom null/type handling of the Compare method below,
+        ' instead of the base CaseInsensitiveComparer.Compare method (which a Shadows method does not override).
 
 #Region " Constructors "
 
@@ -85,7 +89,7 @@ Namespace DevCase.Core.Application.Types
         ''' </returns>
         ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
-        Public Shadows Function Compare(a As Object, b As Object) As Integer
+        Public Shadows Function Compare(a As Object, b As Object) As Integer Implements IComparer.Compare
 
             ' Null parsing.
             If a Is Nothing AndAlso b Is Nothing Then

@@ -1,7 +1,7 @@
 ﻿
 Namespace FHM
 
-    Public NotInheritable Class PageCrawlBeginEventArgs
+    Public NotInheritable Class PageCrawlBeginEventArgs : Inherits EventArgs
 
         Public Property PageIndex As Integer
 

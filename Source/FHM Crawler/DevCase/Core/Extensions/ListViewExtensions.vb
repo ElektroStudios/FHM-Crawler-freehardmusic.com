@@ -27,6 +27,7 @@
 
 #Region " Imports "
 
+Imports System.Collections.Generic
 Imports System.ComponentModel
 Imports System.Diagnostics
 Imports System.Linq
@@ -92,36 +93,32 @@ Namespace DevCase.Core.Extensions.[ListView]
         Public Function ExportToCSV(sender As WinForms.ListView,
                                     Optional defaultValueIfEmpty As String = "") As String
 
+            If sender Is Nothing Then
+                Throw New ArgumentNullException(paramName:=NameOf(sender))
+            End If
+
             Dim sb As New Text.StringBuilder()
 
             ' Add the column names to the CSV.
-            For Each col As ColumnHeader In sender.Columns
-                sb.Append(col.Text & ","c)
-            Next col
-            sb.Remove((sb.Length - 1), 1)
+            sb.Append(String.Join(",", From col As ColumnHeader In sender.Columns.Cast(Of ColumnHeader)()
+                                       Select ListViewExtensions.EscapeCsvField(col.Text)))
             sb.AppendLine()
 
             ' Add the item values to the CSV.
             For Each row As ListViewItem In sender.Items
 
+                Dim fields As New List(Of String)
+
                 For Each cell As ListViewSubItem In row.SubItems
-
-                    If Not String.IsNullOrEmpty(cell.Text) Then
-                        sb.Append(cell.Text & ","c)
-                    Else
-                        sb.Append(defaultValueIfEmpty & ","c)
-                    End If
-
+                    fields.Add(ListViewExtensions.EscapeCsvField(If(String.IsNullOrEmpty(cell.Text), defaultValueIfEmpty, cell.Text)))
                 Next cell
 
-                sb.Remove((sb.Length - 1), 1)
+                ' Fill the missing sub-items with the default value.
+                Do While fields.Count < sender.Columns.Count
+                    fields.Add(ListViewExtensions.EscapeCsvField(defaultValueIfEmpty))
+                Loop
 
-                If (row.SubItems.Count < sender.Columns.Count) Then
-                    For count As Integer = 0 To ((sender.Columns.Count - row.SubItems.Count) - 1)
-                        sb.Append(String.Format(",{0}", defaultValueIfEmpty))
-                    Next
-                End If
-
+                sb.Append(String.Join(",", fields))
                 sb.AppendLine()
 
             Next row
@@ -221,6 +218,40 @@ subItemIndex As Integer)
             Clipboard.SetText(sb.ToString())
 
         End Sub
+
+#End Region
+
+#Region " Private Methods "
+
+        ''' ----------------------------------------------------------------------------------------------------
+        ''' <summary>
+        ''' Escapes a field value following the <c>CSV</c> rules (RFC 4180):
+        ''' values containing commas, double quotes or line breaks are enclosed in double quotes,
+        ''' and the inner double quotes are doubled.
+        ''' </summary>
+        ''' ----------------------------------------------------------------------------------------------------
+        ''' <param name="value">
+        ''' The field value.
+        ''' </param>
+        ''' ----------------------------------------------------------------------------------------------------
+        ''' <returns>
+        ''' The escaped field value.
+        ''' </returns>
+        ''' ----------------------------------------------------------------------------------------------------
+        <DebuggerStepThrough>
+        Friend Function EscapeCsvField(value As String) As String
+
+            If String.IsNullOrEmpty(value) Then
+                Return String.Empty
+            End If
+
+            If value.IndexOfAny({","c, """"c, ControlChars.Cr, ControlChars.Lf}) = -1 Then
+                Return value
+            End If
+
+            Return $"""{value.Replace("""", """""")}"""
+
+        End Function
 
 #End Region
 
