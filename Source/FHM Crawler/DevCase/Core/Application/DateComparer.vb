@@ -38,24 +38,19 @@ Imports DevCase.Core.Application.Enums
 
 Namespace DevCase.Core.Application.Types
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Performs a comparison between two <see cref="Date"/> instances.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <remarks>
     ''' <seealso cref="IComparer"/>
     ''' </remarks>
-    ''' ----------------------------------------------------------------------------------------------------
     Public NotInheritable Class DateComparer : Implements IComparer
 
 #Region " Constructors "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Initializes a new instance of the <see cref="DateComparer"/> class.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerNonUserCode>
         Public Sub New()
         End Sub
@@ -64,11 +59,9 @@ Namespace DevCase.Core.Application.Types
 
 #Region " Public Methods "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="a">
         ''' The first object to compare.
         ''' </param>
@@ -76,7 +69,6 @@ Namespace DevCase.Core.Application.Types
         ''' <param name="b">
         ''' The second object to compare.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' A signed integer that indicates the relative values of <paramref name="a"/> and <paramref name="b"/>.
         ''' <para></para>
@@ -86,7 +78,6 @@ Namespace DevCase.Core.Application.Types
         ''' <para></para>
         ''' Greater than 0: <paramref name="a"/> is greater than <paramref name="b"/>.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         Public Function Compare(a As Object, b As Object) As Integer Implements IComparer.Compare
 

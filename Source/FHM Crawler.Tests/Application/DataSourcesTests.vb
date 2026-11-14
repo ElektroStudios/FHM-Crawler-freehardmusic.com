@@ -20,22 +20,18 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
 Namespace ApplicationTests
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Tests the integrity of the <see cref="DataSources"/> module
     ''' (the values of the search filter combo boxes, sent as-is to the FHM website).
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <TestClass>
     Public NotInheritable Class DataSourcesTests
 
 #Region " Common Rules "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Every list starts with the <c>"all"</c> value, which is the default search filter value.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow(NameOf(DataSources.years))>
         <DataRow(NameOf(DataSources.genres))>
@@ -47,11 +43,9 @@ Namespace ApplicationTests
             Assert.AreEqual(1, values.Count(Function(value As String) value.Equals("all", StringComparison.OrdinalIgnoreCase)))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' No list contains empty values or values with leading or trailing white-spaces.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow(NameOf(DataSources.years))>
         <DataRow(NameOf(DataSources.genres))>
@@ -65,11 +59,9 @@ Namespace ApplicationTests
             Next value
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' No list contains duplicated values (case-insensitive).
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow(NameOf(DataSources.years))>
         <DataRow(NameOf(DataSources.genres))>
@@ -89,11 +81,9 @@ Namespace ApplicationTests
 
 #Region " Years "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Every year (after <c>"all"</c>) is a four-digit number, sorted in ascending order.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Years_AreFourDigitNumbersInAscendingOrder()
             Dim years As New List(Of Integer)
@@ -108,11 +98,9 @@ Namespace ApplicationTests
             CollectionAssert.AreEqual(years.OrderBy(Function(year As Integer) year).ToList(), years)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Regression test (v1.2.0): the year list is no longer capped at 2018.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Years_IncludeRecentYears()
             CollectionAssert.IsSubsetOf({"2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"}, DataSources.years)
@@ -122,11 +110,9 @@ Namespace ApplicationTests
 
 #Region " Countries "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The countries (after <c>"all"</c>) are sorted alphabetically, so they are easy to find in the combo box.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Countries_AreSortedAlphabetically()
             Dim countries As String() = DataSources.countries.Skip(1).ToArray()
@@ -138,23 +124,18 @@ Namespace ApplicationTests
 
 #Region " Private Methods "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Gets a data source list by name.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="listName">
         ''' The name of the list (<c>years</c>, <c>genres</c> or <c>countries</c>).
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' The list values.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <exception cref="ArgumentException">
         ''' Thrown when <paramref name="listName"/> is not a known list name.
         ''' </exception>
-        ''' ----------------------------------------------------------------------------------------------------
         Private Shared Function GetDataSource(listName As String) As String()
             Select Case listName
                 Case NameOf(DataSources.years)

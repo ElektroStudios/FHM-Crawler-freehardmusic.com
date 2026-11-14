@@ -29,11 +29,9 @@
 
 Namespace DevCase.Core.Application.Enums
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Specifies a comparison result.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     Public Enum ComparerResult As Integer
 
         ''' <summary>

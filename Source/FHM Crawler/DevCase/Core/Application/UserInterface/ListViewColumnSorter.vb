@@ -40,11 +40,9 @@ Imports DevCase.Core.Application.UserInterface.Enums
 
 Namespace DevCase.Core.Application.UserInterface.Types
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Performs a sorting operation in a <see cref="ListView"/>.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <example> This is a code example.
     ''' <code>
     ''' Public Class Form1 : Inherits Form
@@ -149,64 +147,50 @@ Namespace DevCase.Core.Application.UserInterface.Types
     ''' End Class
     ''' </code>
     ''' </example>
-    ''' ----------------------------------------------------------------------------------------------------
     Public NotInheritable Class ListViewColumnSorter : Implements IComparer
 
 #Region " Private Fields "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The comparer instance.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         Private comparer As IComparer
 
 #End Region
 
 #Region " Properties "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Gets or sets the index of the column to which to apply the sorting operation (default index is <c>0</c>).
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <value>
         ''' The index of the column to which to apply the sorting operation (default index is <c>0</c>).
         ''' </value>
-        ''' ----------------------------------------------------------------------------------------------------
         Public Property ColumnIndex As Integer
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Gets or sets the order of sorting to apply.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <value>
         ''' The order of sorting to apply.
         ''' </value>
-        ''' ----------------------------------------------------------------------------------------------------
         Public Property Order As SortOrder
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Gets or sets the sort modifier.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <value>
         ''' The sort modifier.
         ''' </value>
-        ''' ----------------------------------------------------------------------------------------------------
         Public Property SortModifier As SortModifiers
 
 #End Region
 
 #Region " Constructors "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Initializes a new instance of the <see cref="ListViewColumnSorter"/> class.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerNonUserCode>
         Public Sub New()
 
@@ -221,11 +205,9 @@ Namespace DevCase.Core.Application.UserInterface.Types
 
 #Region " Public Methods "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="a">
         ''' The first object to compare.
         ''' </param>
@@ -233,7 +215,6 @@ Namespace DevCase.Core.Application.UserInterface.Types
         ''' <param name="b">
         ''' The second object to compare.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' A signed integer that indicates the relative values of <paramref name="a"/> and <paramref name="b"/>.
         ''' <para></para>
@@ -243,7 +224,6 @@ Namespace DevCase.Core.Application.UserInterface.Types
         ''' <para></para>
         ''' Greater than 0: <paramref name="a"/> is greater than <paramref name="b"/>.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         Public Function Compare(a As Object, b As Object) As Integer Implements IComparer.Compare
 

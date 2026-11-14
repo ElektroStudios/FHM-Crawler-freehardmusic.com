@@ -20,22 +20,18 @@ Imports FHM
 
 Namespace FHMTests
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Tests the data types of the FHM namespace: <see cref="SearchFilter"/>, <see cref="AlbumInfo"/>,
     ''' <see cref="AlbumListing"/>, <see cref="PageCrawlBeginEventArgs"/> and <see cref="PageCrawlEndEventArgs"/>.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <TestClass>
     Public NotInheritable Class ModelTests
 
 #Region " SearchFilter "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The parameterless construction searches everything.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub SearchFilter_Default_SearchesEverything()
             Dim filter As New SearchFilter()
@@ -46,11 +42,9 @@ Namespace FHMTests
             Assert.AreEqual("all", filter.Year)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The artist constructor searches the artist in all genres, countries and years.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub SearchFilter_Artist_SearchesTheArtistEverywhere()
             Dim filter As New SearchFilter("Judas Priest")
@@ -61,11 +55,9 @@ Namespace FHMTests
             Assert.AreEqual("all", filter.Year)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The custom search constructor sets the specified criteria and leaves the artist empty.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub SearchFilter_CustomSearch_SetsTheCriteria()
             Dim filter As New SearchFilter(genre:="Thrash metal", country:="Germany", year:="1985")
@@ -76,11 +68,9 @@ Namespace FHMTests
             Assert.AreEqual("1985", filter.Year)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The omitted criteria of the custom search constructor default to "all".
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub SearchFilter_CustomSearch_OmittedCriteriaDefaultToAll()
             Dim filter As New SearchFilter(year:="2001")
@@ -94,11 +84,9 @@ Namespace FHMTests
 
 #Region " AlbumInfo "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The album information keeps the provided values.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub AlbumInfo_KeepsValues()
             Dim urls As String() = {"http://host/a", "http://host/b"}
@@ -114,11 +102,9 @@ Namespace FHMTests
 
 #Region " AlbumListing "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The album listing keeps the provided values.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub AlbumListing_KeepsValues()
             Dim listing As New AlbumListing("Europe", "The Final Countdown", "1986")
@@ -128,11 +114,9 @@ Namespace FHMTests
             Assert.AreEqual("1986", listing.Sobi2Id)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Invalid album listing values are rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub AlbumListing_InvalidValues_Throw()
             Assert.ThrowsExactly(Of ArgumentNullException)(Sub()
@@ -153,11 +137,9 @@ Namespace FHMTests
 
 #Region " Event Args "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The begin event data keeps the page index and derives from <see cref="EventArgs"/>.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub PageCrawlBeginEventArgs_KeepsPageIndex()
             Dim e As New PageCrawlBeginEventArgs(3)
@@ -166,11 +148,9 @@ Namespace FHMTests
             Assert.IsInstanceOfType(Of EventArgs)(e)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The end event data keeps the page index and the albums, and derives from <see cref="EventArgs"/>.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub PageCrawlEndEventArgs_KeepsPageIndexAndAlbums()
             Dim albums As New List(Of AlbumInfo) From {New AlbumInfo("A", "B", Array.Empty(Of String)())}

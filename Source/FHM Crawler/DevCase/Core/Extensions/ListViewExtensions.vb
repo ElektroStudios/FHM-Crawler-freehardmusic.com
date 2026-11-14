@@ -43,21 +43,17 @@ Imports WinForms = System.Windows.Forms
 
 Namespace DevCase.Core.Extensions.[ListView]
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Contains custom extension methods to use with <see cref="ListView"/> control.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <HideModuleName>
     Public Module ListViewExtensions
 
 #Region " Public Extension Methods "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Exports the source <see cref="WinForms.ListView"/> to <c>CSV</c> table format.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <example> This is a code example.
         ''' <code>
         ''' Dim lv As New ListView
@@ -73,7 +69,6 @@ Namespace DevCase.Core.Extensions.[ListView]
         ''' Console.WriteLine(csv)
         ''' </code>
         ''' </example>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="sender">
         ''' The source <see cref="WinForms.ListView"/>.
         ''' </param>
@@ -82,11 +77,9 @@ Namespace DevCase.Core.Extensions.[ListView]
         ''' A default value to write in a <c>CSV</c> field 
         ''' if the corresponding <see cref="ListViewSubItem"/> value is <see langword="Nothing"/>.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' The resulting <c>CSV</c> table string.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>
@@ -127,15 +120,12 @@ Namespace DevCase.Core.Extensions.[ListView]
 
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Copies all the text contained in the current checked items of <see cref="WinForms.ListView"/> to the clipboard.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="sender">
         ''' The source <see cref="ListView"/>.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>
@@ -145,11 +135,9 @@ Namespace DevCase.Core.Extensions.[ListView]
 
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Copies all the text contained in the current checked items of <see cref="WinForms.ListView"/> to the clipboard.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="sender">
         ''' The source <see cref="ListView"/>.
         ''' </param>
@@ -157,7 +145,6 @@ Namespace DevCase.Core.Extensions.[ListView]
         ''' <param name="separator">
         ''' The string used to separate the text of the subitems.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>
@@ -168,11 +155,9 @@ separator As String)
 
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Copies all the text contained in the current checked items of <see cref="WinForms.ListView"/> to the clipboard.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="sender">
         ''' The source <see cref="WinForms.ListView"/>.
         ''' </param>
@@ -186,7 +171,6 @@ separator As String)
         ''' <para></para>
         ''' If <paramref name="subItemIndex"/> is <c>-1</c>, all subitems are copied.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>
@@ -223,21 +207,17 @@ subItemIndex As Integer)
 
 #Region " Private Methods "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Escapes a field value following the <c>CSV</c> rules (RFC 4180):
         ''' values containing commas, double quotes or line breaks are enclosed in double quotes,
         ''' and the inner double quotes are doubled.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="value">
         ''' The field value.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' The escaped field value.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         Friend Function EscapeCsvField(value As String) As String
 

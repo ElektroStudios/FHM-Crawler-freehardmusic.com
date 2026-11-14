@@ -22,22 +22,18 @@ Imports DevCase.Core.Application.Types
 
 Namespace DevCaseTests
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Tests the comparers used to sort the album list: <see cref="TextComparer"/>, <see cref="NumericComparer"/>,
     ''' <see cref="DateComparer"/> and <see cref="StringLengthComparer"/>.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <TestClass>
     Public NotInheritable Class ComparerTests
 
 #Region " TextComparer "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Strings are compared case-insensitively.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub TextComparer_ComparesCaseInsensitively()
             Dim comparer As IComparer = New TextComparer()
@@ -47,11 +43,9 @@ Namespace DevCaseTests
             Assert.IsTrue(comparer.Compare("Saxon", "accept") > 0)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Null values are sorted before any value.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub TextComparer_SortsNullFirst()
             Dim comparer As IComparer = New TextComparer()
@@ -61,7 +55,6 @@ Namespace DevCaseTests
             Assert.AreEqual(ComparerResult.GreaterThan, DirectCast(comparer.Compare("a", Nothing), ComparerResult))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Through the <see cref="IComparer"/> interface, non-string values follow the custom rules
         ''' (strings are greater than non-strings; two non-strings are equal) instead of throwing.
@@ -69,7 +62,6 @@ Namespace DevCaseTests
         ''' Regression: the custom method was a <c>Shadows</c> method, so interface calls used the base
         ''' <see cref="CaseInsensitiveComparer"/>, which throws for values of different types.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub TextComparer_ThroughInterface_UsesCustomRulesForNonStrings()
             Dim comparer As IComparer = New TextComparer()
@@ -83,11 +75,9 @@ Namespace DevCaseTests
 
 #Region " NumericComparer "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Numeric strings are compared by value, not lexically.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub NumericComparer_ComparesByValue()
             Dim comparer As IComparer = New NumericComparer()
@@ -98,11 +88,9 @@ Namespace DevCaseTests
             Assert.AreEqual(ComparerResult.LessThan, DirectCast(comparer.Compare("-5", "3"), ComparerResult))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Numbers are sorted after non-numeric text; two non-numeric texts are compared as text.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub NumericComparer_MixedValues()
             Dim comparer As IComparer = New NumericComparer()
@@ -112,11 +100,9 @@ Namespace DevCaseTests
             Assert.AreEqual(ComparerResult.LessThan, DirectCast(comparer.Compare("abc", "abd"), ComparerResult))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Null values are sorted before any value.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub NumericComparer_SortsNullFirst()
             Dim comparer As IComparer = New NumericComparer()
@@ -130,11 +116,9 @@ Namespace DevCaseTests
 
 #Region " DateComparer "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Date strings are compared chronologically.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub DateComparer_ComparesChronologically()
             Dim comparer As IComparer = New DateComparer()
@@ -144,11 +128,9 @@ Namespace DevCaseTests
             Assert.AreEqual(ComparerResult.Equals, DirectCast(comparer.Compare("2020-02-29", "2020-02-29"), ComparerResult))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Dates are sorted before non-date text; two non-date texts are compared as text.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub DateComparer_MixedValues()
             Dim comparer As IComparer = New DateComparer()
@@ -158,11 +140,9 @@ Namespace DevCaseTests
             Assert.AreEqual(ComparerResult.LessThan, DirectCast(comparer.Compare("abc", "abd"), ComparerResult))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Null values are sorted before any value.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub DateComparer_SortsNullFirst()
             Dim comparer As IComparer = New DateComparer()
@@ -176,11 +156,9 @@ Namespace DevCaseTests
 
 #Region " StringLengthComparer "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Strings are compared by length first, then by value.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub StringLengthComparer_ComparesByLengthThenValue()
             Dim comparer As IComparer(Of String) = New StringLengthComparer()
@@ -191,11 +169,9 @@ Namespace DevCaseTests
             Assert.AreEqual(ComparerResult.Equals, DirectCast(comparer.Compare("same", "same"), ComparerResult))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Null values are sorted before any value.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub StringLengthComparer_SortsNullFirst()
             Dim comparer As IComparer(Of String) = New StringLengthComparer()
@@ -205,11 +181,9 @@ Namespace DevCaseTests
             Assert.AreEqual(ComparerResult.GreaterThan, DirectCast(comparer.Compare("", Nothing), ComparerResult))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The comparer sorts a list by length.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub StringLengthComparer_SortsList()
             Dim items As New List(Of String) From {"Rainbow", "Dio", "Kiss", "Ozzy", "Accept"}

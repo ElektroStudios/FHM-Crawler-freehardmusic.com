@@ -22,21 +22,17 @@ Imports FHM
 
 Namespace FHMTests
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Tests the addresses built by the <see cref="Crawler"/> (search pages, download links and pagination).
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <TestClass>
     Public NotInheritable Class CrawlerQueryTests
 
 #Region " BuildSearchQuery "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The search query targets the FHM search page.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub BuildSearchQuery_TargetsTheSearchPage()
             Dim query As String = Crawler.BuildSearchQuery(New SearchFilter(), pageIndex:=0)
@@ -44,11 +40,9 @@ Namespace FHMTests
             StringAssert.StartsWith(query, "http://freehardmusic.com/index.php?")
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The search query contains all the parameters expected by the website, in the original order.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub BuildSearchQuery_ContainsExpectedParametersInOrder()
             Dim query As NameValueCollection = CrawlerQueryTests.ParseQuery(Crawler.BuildSearchQuery(New SearchFilter(), pageIndex:=0))
@@ -72,11 +66,9 @@ Namespace FHMTests
             Assert.AreEqual("13", query("Itemid"))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The search query carries the values of the search filter.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub BuildSearchQuery_CarriesSearchFilterValues()
             Dim filter As New SearchFilter(genre:="Heavy metal", country:="Spain", year:="1986")
@@ -90,11 +82,9 @@ Namespace FHMTests
             Assert.AreEqual("1986", query("field_year"))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Reserved URL characters in the filter values are encoded, so they cannot break the query string.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub BuildSearchQuery_EncodesReservedCharacters()
             Dim filter As New SearchFilter("Guns & Roses?=#")
@@ -107,11 +97,9 @@ Namespace FHMTests
             StringAssert.Contains(rawQuery, "field_band=Guns+%26+Roses%3f%3d%23")
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The search query carries the requested (zero-based) page index.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow(0)>
         <DataRow(1)>
@@ -122,21 +110,17 @@ Namespace FHMTests
             Assert.AreEqual(pageIndex.ToString(CultureInfo.InvariantCulture), query("SobiSearchPage"))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A null search filter is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub BuildSearchQuery_NullFilter_Throws()
             Assert.ThrowsExactly(Of ArgumentNullException)(Sub() Crawler.BuildSearchQuery(Nothing, pageIndex:=0))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A negative page index is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub BuildSearchQuery_NegativePageIndex_Throws()
             Assert.ThrowsExactly(Of ArgumentOutOfRangeException)(Sub() Crawler.BuildSearchQuery(New SearchFilter(), pageIndex:=-1))
@@ -146,11 +130,9 @@ Namespace FHMTests
 
 #Region " BuildDownloadUrlsQuery "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The download links query targets the FHM XML endpoint with the expected parameters.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub BuildDownloadUrlsQuery_TargetsTheXmlEndpointWithExpectedParameters()
             Dim rawQuery As String = Crawler.BuildDownloadUrlsQuery("4321")
@@ -165,11 +147,9 @@ Namespace FHMTests
             Assert.AreEqual("1", query("rvote"))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' An empty or white-space album identifier is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow("")>
         <DataRow("   ")>
@@ -177,11 +157,9 @@ Namespace FHMTests
             Assert.ThrowsExactly(Of ArgumentException)(Sub() Crawler.BuildDownloadUrlsQuery(sobi2Id))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A null album identifier is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub BuildDownloadUrlsQuery_NullId_Throws()
             Assert.ThrowsExactly(Of ArgumentException)(Sub() Crawler.BuildDownloadUrlsQuery(Nothing))
@@ -191,13 +169,11 @@ Namespace FHMTests
 
 #Region " GetPageCount "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The page count is the album count divided by the page size, rounded up.
         ''' <para></para>
         ''' Regression: exact multiples of the page size used to request an extra (empty) page, which crashed the crawler.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow(0, 0)>
         <DataRow(1, 1)>
@@ -212,11 +188,9 @@ Namespace FHMTests
             Assert.AreEqual(expectedPageCount, Crawler.GetPageCount(albumCount))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A negative album count is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub GetPageCount_NegativeCount_Throws()
             Assert.ThrowsExactly(Of ArgumentOutOfRangeException)(Sub() Crawler.GetPageCount(-1))
@@ -226,19 +200,15 @@ Namespace FHMTests
 
 #Region " Private Methods "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Parses the query string of an absolute address.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="address">
         ''' The absolute address.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' The parsed (decoded) query parameters.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         Private Shared Function ParseQuery(address As String) As NameValueCollection
             Return HttpUtility.ParseQueryString(New Uri(address).Query)
         End Function

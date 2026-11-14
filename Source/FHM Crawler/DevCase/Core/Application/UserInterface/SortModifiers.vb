@@ -29,11 +29,9 @@
 
 Namespace DevCase.Core.Application.UserInterface.Enums
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Specifies a Sorting Modifier.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     Public Enum SortModifiers As Integer
 
         ''' <summary>

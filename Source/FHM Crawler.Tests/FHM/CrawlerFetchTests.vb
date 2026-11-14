@@ -28,21 +28,17 @@ Imports FHMCrawler.Tests.Infrastructure
 
 Namespace FHMTests
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Tests the asynchronous fetch workflow of the <see cref="Crawler"/> against an in-memory fake of the FHM website.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <TestClass>
     Public NotInheritable Class CrawlerFetchTests
 
 #Region " GetAlbumCount "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The album count is read from the first search results page.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function GetAlbumCountAsync_ReadsTheFirstSearchPage() As Task
             Dim server As New FakeWebServer()
@@ -56,11 +52,9 @@ Namespace FHMTests
             Assert.AreEqual(1, server.CountSearchPageRequests(0))
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The synchronous wrapper returns the same album count.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub GetAlbumCount_Synchronous_ReturnsTheAlbumCount()
             Dim server As New FakeWebServer()
@@ -70,11 +64,9 @@ Namespace FHMTests
             Assert.AreEqual(5, fhmCrawler.GetAlbumCount())
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The search request carries the current search filter.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function GetAlbumCountAsync_UsesTheCurrentSearchFilter() As Task
             Dim server As New FakeWebServer()
@@ -88,11 +80,9 @@ Namespace FHMTests
             Assert.AreEqual("Accept", query("field_band"))
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A download delegate that returns a null string fails loudly instead of being parsed.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function GetAlbumCountAsync_NullContent_ThrowsInvalidOperationException() As Task
             Dim server As New FakeWebServer()
@@ -102,11 +92,9 @@ Namespace FHMTests
             Await Assert.ThrowsExactlyAsync(Of InvalidOperationException)(Function() fhmCrawler.GetAlbumCountAsync()).ConfigureAwait(False)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A download delegate that returns a null task fails loudly.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function GetAlbumCountAsync_NullTask_ThrowsInvalidOperationException() As Task
             Dim fhmCrawler As New Crawler(New CookieContainer(), Function(address As Uri) Nothing)
@@ -118,11 +106,9 @@ Namespace FHMTests
 
 #Region " FetchAlbumsAsync "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A search without results completes successfully without crawling any page.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function FetchAlbumsAsync_NoResults_CompletesWithoutCrawlingPages() As Task
             Dim server As New FakeWebServer()
@@ -138,12 +124,10 @@ Namespace FHMTests
             Assert.IsFalse(fhmCrawler.IsFetching)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Every page is crawled in order, raising a begin/end event pair per page,
         ''' and the albums carry their parsed download links.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function FetchAlbumsAsync_CrawlsEveryPageAndDeliversAlbums() As Task
             Dim server As New FakeWebServer()
@@ -179,14 +163,12 @@ Namespace FHMTests
             Assert.AreEqual(0, page1(0).DounloadUrls.Length)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' An album count that is an exact multiple of the page size does not request an extra page.
         ''' <para></para>
         ''' Regression: the original code requested <c>(count \ 10) + 1</c> pages; the extra page had no albums
         ''' and crashed the crawler with a <see cref="NullReferenceException"/>.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function FetchAlbumsAsync_ExactMultipleOfPageSize_DoesNotRequestExtraPage() As Task
             Dim server As New FakeWebServer()
@@ -202,11 +184,9 @@ Namespace FHMTests
             CollectionAssert.AreEqual({"Begin:0", "End:0", "Begin:1", "End:1"}, recorder.Sequence)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A page that lists no album completes its begin/end event pair with an empty album list.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function FetchAlbumsAsync_PageWithoutAlbums_RaisesEndEventWithEmptyList() As Task
             Dim server As New FakeWebServer()
@@ -221,12 +201,10 @@ Namespace FHMTests
             Assert.AreEqual(0, recorder.EndPages(0).Albums.Count)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Albums whose download links cannot be retrieved (network error) or parsed (malformed XML,
         ''' unexpected document) are skipped, and the rest of the page is still delivered.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function FetchAlbumsAsync_SkipsAlbumsWithBrokenDownloadLinks() As Task
             Dim server As New FakeWebServer()
@@ -251,11 +229,9 @@ Namespace FHMTests
             CollectionAssert.AreEqual({"http://host/valid"}, albums(0).DounloadUrls)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Unexpected errors while downloading the links of an album are not swallowed (fail-fast).
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function FetchAlbumsAsync_UnexpectedAlbumError_Propagates() As Task
             Dim server As New FakeWebServer()
@@ -267,14 +243,12 @@ Namespace FHMTests
             Assert.IsFalse(fhmCrawler.IsFetching)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A failed fetch operation (e.g. network error) does not leave the crawler marked as busy.
         ''' <para></para>
         ''' Regression: the busy flag was not reset on errors, so every later fetch failed with
         ''' "Another fetch operation is already running" until the application was restarted.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function FetchAlbumsAsync_AfterNetworkFailure_CanFetchAgain() As Task
             Dim serverIsDown As Boolean = True
@@ -297,11 +271,9 @@ Namespace FHMTests
             Assert.IsTrue(completed)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Starting a fetch operation while another one is running is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function FetchAlbumsAsync_WhileRunning_ThrowsInvalidOperationException() As Task
             Dim pendingPage As New TaskCompletionSource(Of String)(TaskCreationOptions.RunContinuationsAsynchronously)
@@ -321,11 +293,9 @@ Namespace FHMTests
             Assert.IsFalse(fhmCrawler.IsFetching)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The synchronous wrapper runs the whole fetch operation.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub FetchAlbums_Synchronous_RunsTheWholeOperation()
             Dim server As New FakeWebServer()
@@ -340,12 +310,10 @@ Namespace FHMTests
             Assert.IsFalse(fhmCrawler.IsFetching)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The events are raised on the <see cref="SynchronizationContext"/> captured when the fetch operation
         ''' started (e.g. the UI thread), even when the crawler continues on thread-pool threads.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function FetchAlbumsAsync_RaisesEventsOnTheCapturedSynchronizationContext() As Task
             Dim pendingCount As New TaskCompletionSource(Of String)(TaskCreationOptions.RunContinuationsAsynchronously)
@@ -391,12 +359,10 @@ Namespace FHMTests
 
 #Region " CancelFetchAlbumsAsync "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A cancelled fetch operation returns <see langword="False"/> without crawling the pending page;
         ''' redundant cancellations throw an <see cref="OperationCanceledException"/>.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function CancelFetchAlbumsAsync_DuringFetch_StopsTheOperation() As Task
             Dim pendingPage As New TaskCompletionSource(Of String)(TaskCreationOptions.RunContinuationsAsynchronously)
@@ -430,11 +396,9 @@ Namespace FHMTests
             Assert.IsFalse(fhmCrawler.IsFetching)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A new fetch operation after a cancellation is not affected by the previous cancellation.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Async Function FetchAlbumsAsync_AfterCancellation_RunsNormally() As Task
             Dim pendingPage As New TaskCompletionSource(Of String)(TaskCreationOptions.RunContinuationsAsynchronously)
@@ -464,11 +428,9 @@ Namespace FHMTests
             CollectionAssert.AreEqual({"Begin:0", "End:0"}, recorder.Sequence)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Cancelling while no fetch operation is running is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub CancelFetchAlbumsAsync_WhenIdle_ThrowsInvalidOperationException()
             Dim fhmCrawler As Crawler = CrawlerFetchTests.CreateCrawler(New FakeWebServer())
@@ -480,19 +442,15 @@ Namespace FHMTests
 
 #Region " Private Methods "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Creates a crawler that downloads its content from the specified fake server.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="server">
         ''' The fake server.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' The crawler.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         Private Shared Function CreateCrawler(server As FakeWebServer) As Crawler
             Return New Crawler(New CookieContainer(), AddressOf server.DownloadStringAsync)
         End Function

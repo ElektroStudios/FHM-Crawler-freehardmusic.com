@@ -18,19 +18,15 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
 Namespace DevCaseTests
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Tests the <see cref="TabControlExtensions"/> module.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <TestClass>
     Public NotInheritable Class TabControlExtensionsTests
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Disabling a tab page disables only that page.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub DisableTabs_DisablesOnlyTheSpecifiedPages()
             Using tc As New TabControl(), page1 As New TabPage("Search"), page2 As New TabPage("Browser")
@@ -47,11 +43,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A previously disabled tab page can be enabled again.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub EnableTabs_ReEnablesDisabledPages()
             Using tc As New TabControl(), page1 As New TabPage("Search"), page2 As New TabPage("Browser")
@@ -65,11 +59,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Redundant calls (disabling twice, enabling a page that is not disabled) are harmless.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub DisableAndEnableTabs_RedundantCalls_AreHarmless()
             Using tc As New TabControl(), page As New TabPage("Search")
@@ -87,11 +79,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A null tab control or a null tab page array is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub DisableAndEnableTabs_NullArguments_Throw()
             Using tc As New TabControl()

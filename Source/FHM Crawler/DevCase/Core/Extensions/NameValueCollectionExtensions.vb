@@ -39,22 +39,18 @@ Imports System.Web
 
 Namespace DevCase.Core.Extensions.[NameValueCollection]
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Contains custom extension methods to use with an <see cref="Collections.Specialized.NameValueCollection"/>.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <HideModuleName>
     Public Module NameValueCollectionExtensions
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Converts the name and values of a <see cref="Collections.Specialized.NameValueCollection"/> 
         ''' to a formatted web-request query string.
         ''' <para></para>
         ''' Consider this method to be the opposite of <see cref="Global.System.Web.HttpUtility.ParseQueryString"/>.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <example> This is a code example.
         ''' <code>
         ''' Dim baseAddress As String = "http://www.google.com/search"
@@ -66,15 +62,12 @@ Namespace DevCase.Core.Extensions.[NameValueCollection]
         ''' Console.WriteLine(String.Format("{0}?{1}", baseAddress, params.ToQueryString()))
         ''' </code>
         ''' </example>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="sender">
         ''' The source <see cref="Collections.Specialized.NameValueCollection"/>.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' The resulting web-request query string.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>
@@ -84,14 +77,12 @@ Namespace DevCase.Core.Extensions.[NameValueCollection]
 
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Converts the name and values of a <see cref="Collections.Specialized.NameValueCollection"/> 
         ''' to a formatted web-request query string.
         ''' <para></para>
         ''' Consider this method to be the opposite of <see cref="Global.System.Web.HttpUtility.ParseQueryString"/>.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <example> This is a code example.
         ''' <code>
         ''' Dim params As New NameValueCollection()
@@ -102,7 +93,6 @@ Namespace DevCase.Core.Extensions.[NameValueCollection]
         ''' Console.WriteLine(params.ToQueryString(baseAddress:=New Uri("http://www.google.com/search")))
         ''' </code>
         ''' </example>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="sender">
         ''' The source <see cref="Collections.Specialized.NameValueCollection"/>.
         ''' </param>
@@ -110,11 +100,9 @@ Namespace DevCase.Core.Extensions.[NameValueCollection]
         ''' <param name="baseAddress">
         ''' The base url address.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' The resulting web-request query string.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>
@@ -125,14 +113,12 @@ baseAddress As Uri) As String
 
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Converts the name and values of a <see cref="Collections.Specialized.NameValueCollection"/> 
         ''' to a formatted web-request query string.
         ''' <para></para>
         ''' Consider this method to be the opposite of <see cref="Global.System.Web.HttpUtility.ParseQueryString"/>.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <example> This is a code example.
         ''' <code>
         ''' Dim params As New NameValueCollection()
@@ -143,7 +129,6 @@ baseAddress As Uri) As String
         ''' Console.WriteLine(params.ToQueryString(baseAddress:="http://www.google.com/search"))
         ''' </code>
         ''' </example>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="sender">
         ''' The source <see cref="Collections.Specialized.NameValueCollection"/>.
         ''' </param>
@@ -151,11 +136,9 @@ baseAddress As Uri) As String
         ''' <param name="baseAddress">
         ''' The base url address.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' The resulting web-request query string.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>

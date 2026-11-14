@@ -38,24 +38,19 @@ Imports DevCase.Core.Application.Enums
 
 Namespace DevCase.Core.Application.Types
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Performs a comparison between the length of two <see cref="String"/> values.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <remarks>
     ''' <seealso cref="IComparer(Of String)"/>
     ''' </remarks>
-    ''' ----------------------------------------------------------------------------------------------------
     Public NotInheritable Class StringLengthComparer : Implements IComparer(Of String)
 
 #Region " Constructors "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Initializes a new instance of the <see cref="StringLengthComparer"/> class.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerNonUserCode>
         Public Sub New()
         End Sub
@@ -64,12 +59,10 @@ Namespace DevCase.Core.Application.Types
 
 #Region " Public Methods "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Compares two <see cref="String"/> and returns a value 
         ''' indicating whether one has length less than, length equal to, or length greater than the other.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="a">
         ''' The first <see cref="String"/> to compare.
         ''' </param>
@@ -77,7 +70,6 @@ Namespace DevCase.Core.Application.Types
         ''' <param name="b">
         ''' The second <see cref="String"/> to compare.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' A signed integer that indicates the relative values of <paramref name="a"/> and <paramref name="b"/>.
         ''' <para></para>
@@ -87,7 +79,6 @@ Namespace DevCase.Core.Application.Types
         ''' <para></para>
         ''' Greater than 0: <paramref name="a"/> is greater than <paramref name="b"/>.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         Public Function Compare(a As String, b As String) As Integer Implements IComparer(Of String).Compare
 

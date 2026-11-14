@@ -21,19 +21,15 @@ Imports FHM
 
 Namespace FHMTests
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Tests the construction and the state members of the <see cref="Crawler"/>.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <TestClass>
     Public NotInheritable Class CrawlerTests
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A new crawler exposes the provided cookies, a default search filter, and is idle.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Constructor_InitializesState()
             Dim cookies As New CookieContainer()
@@ -49,11 +45,9 @@ Namespace FHMTests
             Assert.IsFalse(fhmCrawler.IsFetching)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Null cookies are rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Constructor_NullCookies_Throws()
             Assert.ThrowsExactly(Of ArgumentNullException)(Sub()
@@ -64,11 +58,9 @@ Namespace FHMTests
                                              End Sub)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A null download delegate is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Constructor_NullDownloadDelegate_Throws()
             Assert.ThrowsExactly(Of ArgumentNullException)(Sub()
@@ -76,11 +68,9 @@ Namespace FHMTests
                                              End Sub)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The cookies can be replaced, but not with a null container.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Cookies_CanBeReplacedButNotNulled()
             Dim fhmCrawler As New Crawler(New CookieContainer())
@@ -93,11 +83,9 @@ Namespace FHMTests
             Assert.AreSame(newCookies, fhmCrawler.Cookies)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Resetting the search filters restores the default values (the instance is kept).
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ResetSearchFilters_RestoresDefaults()
             Dim fhmCrawler As New Crawler(New CookieContainer())

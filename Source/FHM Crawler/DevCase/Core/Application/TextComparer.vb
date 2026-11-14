@@ -39,11 +39,9 @@ Imports DevCase.Core.Application.Enums
 
 Namespace DevCase.Core.Application.Types
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Performs a comparison between two string values.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     Public NotInheritable Class TextComparer : Inherits CaseInsensitiveComparer : Implements IComparer
 
         ' NOTE: IComparer is re-implemented so that callers using an IComparer reference
@@ -52,11 +50,9 @@ Namespace DevCase.Core.Application.Types
 
 #Region " Constructors "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Initializes a new instance of the <see cref="TextComparer"/> class.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerNonUserCode>
         Public Sub New()
         End Sub
@@ -65,11 +61,9 @@ Namespace DevCase.Core.Application.Types
 
 #Region " Public Methods "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="a">
         ''' The first object to compare.
         ''' </param>
@@ -77,7 +71,6 @@ Namespace DevCase.Core.Application.Types
         ''' <param name="b">
         ''' The second object to compare.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' A signed integer that indicates the relative values of <paramref name="a"/> and <paramref name="b"/>.
         ''' <para></para>
@@ -87,7 +80,6 @@ Namespace DevCase.Core.Application.Types
         ''' <para></para>
         ''' Greater than 0: <paramref name="a"/> is greater than <paramref name="b"/>.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <DebuggerStepThrough>
         Public Shadows Function Compare(a As Object, b As Object) As Integer Implements IComparer.Compare
 
@@ -124,61 +116,49 @@ Namespace DevCase.Core.Application.Types
 
 #Region " Hidden Base Members "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Serves as a hash function for a particular type.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <EditorBrowsable(EditorBrowsableState.Never)>
         <DebuggerNonUserCode>
         Public Shadows Function GetHashCode() As Integer
             Return MyBase.GetHashCode()
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Gets the <see cref="Type"/> of the current instance.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' The exact runtime type of the current instance.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <EditorBrowsable(EditorBrowsableState.Never)>
         <DebuggerNonUserCode>
         Public Shadows Function [GetType]() As Type
             Return MyBase.GetType()
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Determines whether the specified <see cref="Object"/> is equal to this instance.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="obj">
         ''' Another object to compare to.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' <see langword="True"/> if the specified <see cref="Object"/> is equal to this instance; 
         ''' otherwise, <see langword="False"/>.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <EditorBrowsable(EditorBrowsableState.Never)>
         <DebuggerNonUserCode>
         Public Shadows Function Equals(obj As Object) As Boolean
             Return MyBase.Equals(obj)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Determines whether the specified <see cref="Object"/> instances are considered equal.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="objA">
         ''' The first object to compare.
         ''' </param>
@@ -186,53 +166,43 @@ Namespace DevCase.Core.Application.Types
         ''' <param name="objB">
         ''' The second object to compare.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' <see langword="True"/> if the objects are considered equal; otherwise, <see langword="False"/>.
         ''' <para></para>
         ''' If both <paramref name="objA"/> and <paramref name="objB"/> are <see langword="Nothing"/>, 
         ''' the method returns <see langword="True"/>.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <EditorBrowsable(EditorBrowsableState.Never)>
         <DebuggerNonUserCode>
         Public Shared Shadows Function Equals(objA As Object, objB As Object) As Boolean
             Return Object.Equals(objA, objB)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Determines whether the specified <see cref="Object"/> instances are the same instance.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="objA">
         ''' The first object to compare.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="objB">
         ''' The second object to compare.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' <see langword="True"/> if <paramref name="objA"/> is the same instance as <paramref name="objB"/> 
         ''' or if both are <see langword="Nothing"/>; otherwise, <see langword="False"/>.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <EditorBrowsable(EditorBrowsableState.Never)>
         <DebuggerNonUserCode>
         Public Shared Shadows Function ReferenceEquals(objA As Object, objB As Object) As Boolean
             Return Object.ReferenceEquals(objA, objB)
         End Function
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Returns a String that represents the current object.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' A string that represents the current object.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         <EditorBrowsable(EditorBrowsableState.Never)>
         <DebuggerNonUserCode>
         Public Overrides Function ToString() As String

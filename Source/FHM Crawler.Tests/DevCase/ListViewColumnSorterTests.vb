@@ -22,21 +22,17 @@ Imports DevCase.Core.Application.UserInterface.Types
 
 Namespace DevCaseTests
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Tests the <see cref="ListViewColumnSorter"/> class.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <TestClass>
     Public NotInheritable Class ListViewColumnSorterTests
 
 #Region " Tests "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A new sorter sorts the first column by text, with no order.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Constructor_InitializesDefaults()
             Dim sorter As New ListViewColumnSorter()
@@ -46,11 +42,9 @@ Namespace DevCaseTests
             Assert.AreEqual(SortModifiers.SortByText, sorter.SortModifier)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Text columns are compared case-insensitively, and the descending order reverses the result.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Compare_Text_AscendingAndDescending()
             Dim items As ListViewItem() = Nothing
@@ -64,11 +58,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The sorter compares the configured column.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Compare_UsesTheConfiguredColumn()
             Dim items As ListViewItem() = Nothing
@@ -79,11 +71,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Numeric columns are compared by value.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Compare_Number_ComparesByValue()
             Dim items As ListViewItem() = Nothing
@@ -94,11 +84,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Date columns are compared chronologically.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Compare_Date_ComparesChronologically()
             Dim items As ListViewItem() = Nothing
@@ -109,13 +97,11 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Switching back to text sorting after a numeric sort compares the values as text again.
         ''' <para></para>
         ''' Regression: the text branch kept using the previously selected comparer (e.g. the numeric one).
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Compare_SwitchingBackToText_UsesTextComparer()
             Dim items As ListViewItem() = Nothing
@@ -129,11 +115,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' An item without the sorted sub-item is sorted first.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Compare_MissingSubItem_IsSortedFirst()
             Dim items As ListViewItem() = Nothing
@@ -146,11 +130,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Items are considered equal when the sorter has no order or the list view is not sorted.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Compare_NoOrder_ReturnsZero()
             Dim items As ListViewItem() = Nothing
@@ -164,11 +146,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' End-to-end: the sorter reorders the items of a real list view.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <STATestMethod>
         Public Sub Sort_ListView_ReordersItems()
             Using lv As ListView = ListViewColumnSorterTests.CreateListView(Nothing, {"Saxon"}, {"accept"}, {"Dio"})
@@ -190,11 +170,9 @@ Namespace DevCaseTests
 
 #Region " Private Methods "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Creates an ascending-sorted list view with two columns and the specified rows.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="refItems">
         ''' When this method returns, contains the created items, in the same order as <paramref name="rows"/>.
         ''' </param>
@@ -202,11 +180,9 @@ Namespace DevCaseTests
         ''' <param name="rows">
         ''' The rows (item text followed by the sub-item texts).
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' The list view.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         Private Shared Function CreateListView(ByRef refItems As ListViewItem(), ParamArray rows As String()()) As ListView
             Dim lv As New ListView() With {.View = View.Details}
             lv.Columns.Add("Column 1")

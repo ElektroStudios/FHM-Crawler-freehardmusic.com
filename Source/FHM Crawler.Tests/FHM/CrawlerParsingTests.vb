@@ -25,21 +25,17 @@ Imports FHMCrawler.Tests.Infrastructure
 
 Namespace FHMTests
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Tests the HTML and XML parsing functions of the <see cref="Crawler"/>.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <TestClass>
     Public NotInheritable Class CrawlerParsingTests
 
 #Region " ParseAlbumCount "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The album count is extracted from the search result summary, regardless of the surrounding white-spaces.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseAlbumCount_ReadsTheNumberFromTheSummary()
             Dim html As String = FhmSamples.SearchPage($"  Found{vbTab}{vbLf}  1234   entries  ")
@@ -47,11 +43,9 @@ Namespace FHMTests
             Assert.AreEqual(1234, Crawler.ParseAlbumCount(html))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Only the first number of the summary is taken as the album count.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseAlbumCount_TakesTheFirstNumber()
             Dim html As String = FhmSamples.SearchPage("42 entries found in 3 categories")
@@ -59,11 +53,9 @@ Namespace FHMTests
             Assert.AreEqual(42, Crawler.ParseAlbumCount(html))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A page without search result summary (the website omits it when there are no results) yields zero.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseAlbumCount_NoSummary_ReturnsZero()
             Assert.AreEqual(0, Crawler.ParseAlbumCount(FhmSamples.SearchPage(summary:=Nothing)))
@@ -71,11 +63,9 @@ Namespace FHMTests
             Assert.AreEqual(0, Crawler.ParseAlbumCount("<html><body>Maintenance</body></html>"))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A summary without any number means an unexpected markup change, so it fails loudly.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseAlbumCount_SummaryWithoutNumber_ThrowsFormatException()
             Dim html As String = FhmSamples.SearchPage("No entries found")
@@ -83,11 +73,9 @@ Namespace FHMTests
             Assert.ThrowsExactly(Of FormatException)(Sub() Crawler.ParseAlbumCount(html))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A null HTML source code is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseAlbumCount_Null_Throws()
             Assert.ThrowsExactly(Of ArgumentNullException)(Sub() Crawler.ParseAlbumCount(Nothing))
@@ -97,11 +85,9 @@ Namespace FHMTests
 
 #Region " ParseAlbumListings "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Every album table of the page is parsed into a listing, in document order.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseAlbumListings_ParsesEveryAlbumInOrder()
             Dim html As String = FhmSamples.SearchPage(2,
@@ -119,11 +105,9 @@ Namespace FHMTests
             Assert.AreEqual("202", listings(1).Sobi2Id)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' HTML entities in the artist name and in the album title are decoded.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseAlbumListings_DecodesHtmlEntities()
             Dim html As String = FhmSamples.SearchPage(1, FhmSamples.AlbumTableWithId("Guns N&#39; Roses", "Use Your Illusion I &amp; II", "7"))
@@ -134,11 +118,9 @@ Namespace FHMTests
             Assert.AreEqual("Use Your Illusion I & II", listing.Title)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A missing artist or title node falls back to "Unknown" (title-cased), as the original crawler did.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseAlbumListings_MissingArtistOrTitle_FallsBackToUnknown()
             Dim html As String = FhmSamples.SearchPage(2,
@@ -154,11 +136,9 @@ Namespace FHMTests
             Assert.AreEqual("Unknown", listings(1).Title)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Albums without details link, or whose link has no album identifier, are skipped.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseAlbumListings_SkipsAlbumsWithoutUsableLink()
             Dim html As String = FhmSamples.SearchPage(4,
@@ -174,13 +154,11 @@ Namespace FHMTests
             Assert.AreEqual("99", listings(0).Sobi2Id)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A page without album tables yields an empty list.
         ''' <para></para>
         ''' Regression: HtmlAgilityPack returns Nothing in that case, which used to throw a <see cref="NullReferenceException"/>.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseAlbumListings_PageWithoutAlbums_ReturnsEmptyList()
             Dim listings As List(Of AlbumListing) = Crawler.ParseAlbumListings(FhmSamples.SearchPage(0))
@@ -189,11 +167,9 @@ Namespace FHMTests
             Assert.AreEqual(0, listings.Count)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A null HTML source code is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseAlbumListings_Null_Throws()
             Assert.ThrowsExactly(Of ArgumentNullException)(Sub() Crawler.ParseAlbumListings(Nothing))
@@ -203,12 +179,10 @@ Namespace FHMTests
 
 #Region " TryExtractSobi2Id "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The album identifier is extracted from absolute and relative links,
         ''' with or without HTML-encoded ampersands, regardless of the parameter position and case.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow("http://freehardmusic.com/index.php?option=com_sobi2&amp;sobi2Task=sobi2Details&amp;sobi2Id=123&amp;Itemid=13", "123")>
         <DataRow("http://freehardmusic.com/index.php?option=com_sobi2&sobi2Task=sobi2Details&sobi2Id=456", "456")>
@@ -224,11 +198,9 @@ Namespace FHMTests
             Assert.AreEqual(expectedId, sobi2Id)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Links without album identifier are rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow("")>
         <DataRow("   ")>
@@ -245,11 +217,9 @@ Namespace FHMTests
             Assert.IsNull(sobi2Id)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A null link is rejected without throwing.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub TryExtractSobi2Id_Null_ReturnsFalse()
             Dim sobi2Id As String = Nothing
@@ -262,11 +232,9 @@ Namespace FHMTests
 
 #Region " NormalizeText "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The text is trimmed, HTML-decoded and title-cased; all-uppercase words (acronyms) are preserved.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow("  black sabbath  ", "Black Sabbath")>
         <DataRow("DEEP purple", "DEEP Purple")>
@@ -278,11 +246,9 @@ Namespace FHMTests
             Assert.AreEqual(expected, Crawler.NormalizeText(rawText))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' UTF-8 text that was decoded with the system ANSI code page (what WebClient does) is repaired.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub NormalizeText_RepairsUtf8DecodedAsAnsi()
             Dim garbled As String = Encoding.Default.GetString(Encoding.UTF8.GetBytes("Motörhead"))
@@ -290,11 +256,9 @@ Namespace FHMTests
             Assert.AreEqual("Motörhead", Crawler.NormalizeText(garbled))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A null text is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub NormalizeText_Null_Throws()
             Assert.ThrowsExactly(Of ArgumentNullException)(Sub() Crawler.NormalizeText(Nothing))
@@ -304,11 +268,9 @@ Namespace FHMTests
 
 #Region " ParseDownloadUrls "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The download links are returned in slot order, trimmed, skipping the empty slots.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseDownloadUrls_ReturnsNonEmptySlotsInOrder()
             Dim xml As String = FhmSamples.DownloadLinksXml("http://host/a", "", "   ", "http://host/b   ", "  http://host/c")
@@ -318,11 +280,9 @@ Namespace FHMTests
             CollectionAssert.AreEqual({"http://host/a", "http://host/b", "http://host/c"}, urls)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' All the 13 slots are read, and elements outside the known slots are ignored.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseDownloadUrls_ReadsAllThirteenSlotsOnly()
             Dim values As String() = Enumerable.Range(1, 14).Select(Function(i As Integer) $"http://host/{i}").ToArray()
@@ -335,11 +295,9 @@ Namespace FHMTests
             Assert.AreEqual("http://host/13", urls(12))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Missing slots are tolerated (not every album fills all of them).
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseDownloadUrls_ToleratesMissingSlots()
             Dim xml As String = "<rev><msg5>http://host/five</msg5><other>x</other><msg13>http://host/thirteen</msg13></rev>"
@@ -348,11 +306,9 @@ Namespace FHMTests
             Assert.AreEqual(0, Crawler.ParseDownloadUrls("<rev/>").Length)
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A malformed XML document throws an <see cref="XmlException"/>.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow("")>
         <DataRow("<html><body>Error</body>")>
@@ -361,21 +317,17 @@ Namespace FHMTests
             Assert.ThrowsExactly(Of XmlException)(Sub() Crawler.ParseDownloadUrls(xml))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A well-formed document with an unexpected root element throws a <see cref="FormatException"/>.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseDownloadUrls_UnexpectedRoot_ThrowsFormatException()
             Assert.ThrowsExactly(Of FormatException)(Sub() Crawler.ParseDownloadUrls("<error><msg>http://host/a</msg></error>"))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A null XML document is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ParseDownloadUrls_Null_Throws()
             Assert.ThrowsExactly(Of ArgumentNullException)(Sub() Crawler.ParseDownloadUrls(Nothing))

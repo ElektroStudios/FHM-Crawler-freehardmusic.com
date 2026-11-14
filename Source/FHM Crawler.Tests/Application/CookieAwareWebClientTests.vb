@@ -18,21 +18,17 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
 Namespace ApplicationTests
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Tests the <see cref="CookieAwareWebClient"/> class.
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <TestClass>
     Public NotInheritable Class CookieAwareWebClientTests
 
 #Region " Tests "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A new client has an empty cookie container ready to use.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub Constructor_CreatesAnEmptyCookieContainer()
             Using client As New CookieAwareWebClient()
@@ -41,12 +37,10 @@ Namespace ApplicationTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The HTTP requests created by the client use its cookie container,
         ''' so the session cookies are sent to the website.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub GetWebRequest_HttpAddress_AttachesTheCookieContainer()
             Dim cookies As New CookieContainer()
@@ -60,11 +54,9 @@ Namespace ApplicationTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Replacing the cookie container affects the requests created afterwards.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub GetWebRequest_AfterReplacingCookies_UsesTheNewContainer()
             Using client As New TestableCookieAwareWebClient()
@@ -77,11 +69,9 @@ Namespace ApplicationTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Non-HTTP requests (which have no cookie container) are created without errors.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub GetWebRequest_FileAddress_IsCreatedWithoutCookies()
             Using client As New TestableCookieAwareWebClient()
@@ -95,26 +85,20 @@ Namespace ApplicationTests
 
 #Region " Test Doubles "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A <see cref="CookieAwareWebClient"/> that exposes its protected <c>GetWebRequest</c> method.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         Private NotInheritable Class TestableCookieAwareWebClient : Inherits CookieAwareWebClient
 
-            ''' ----------------------------------------------------------------------------------------------------
             ''' <summary>
             ''' Creates the <see cref="WebRequest"/> that the client would use for the specified address.
             ''' </summary>
-            ''' ----------------------------------------------------------------------------------------------------
             ''' <param name="address">
             ''' The address.
             ''' </param>
-            ''' ----------------------------------------------------------------------------------------------------
             ''' <returns>
             ''' The web request (no connection is opened).
             ''' </returns>
-            ''' ----------------------------------------------------------------------------------------------------
             Friend Function CreateRequest(address As Uri) As WebRequest
                 Return Me.GetWebRequest(address)
             End Function

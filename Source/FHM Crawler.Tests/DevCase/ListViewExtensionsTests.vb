@@ -20,21 +20,17 @@ Imports DevCase.Core.Extensions.ListView
 
 Namespace DevCaseTests
 
-    ''' ----------------------------------------------------------------------------------------------------
     ''' <summary>
     ''' Tests the <see cref="ListViewExtensions"/> module (CSV export).
     ''' </summary>
-    ''' ----------------------------------------------------------------------------------------------------
     <TestClass>
     Public NotInheritable Class ListViewExtensionsTests
 
 #Region " ExportToCSV "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' The first line contains the column names and every item produces one line, in order.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ExportToCSV_WritesHeaderAndRowsInOrder()
             Using lv As ListView = ListViewExtensionsTests.CreateListView({"Artist", "Title"},
@@ -47,11 +43,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A list view without items produces only the header line.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ExportToCSV_NoItems_WritesOnlyTheHeader()
             Using lv As ListView = ListViewExtensionsTests.CreateListView({"Artist", "Title"})
@@ -60,11 +54,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Empty sub-items are replaced with the specified default value.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ExportToCSV_EmptySubItem_UsesTheDefaultValue()
             Using lv As ListView = ListViewExtensionsTests.CreateListView({"Artist", "Title", "Year"},
@@ -76,12 +68,10 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Items with fewer sub-items than columns are padded with the default value,
         ''' so every line has the same amount of fields as the header.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ExportToCSV_MissingSubItems_ArePaddedWithTheDefaultValue()
             Using lv As ListView = ListViewExtensionsTests.CreateListView({"Artist", "Title", "Year"},
@@ -93,12 +83,10 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Values containing commas, double quotes or line breaks are escaped (RFC 4180),
         ''' so they do not break the column layout of the CSV.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ExportToCSV_SpecialCharacters_AreEscaped()
             Using lv As ListView = ListViewExtensionsTests.CreateListView({"Artist, Band", "Title"},
@@ -111,11 +99,9 @@ Namespace DevCaseTests
             End Using
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' A null list view is rejected.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         Public Sub ExportToCSV_NullListView_Throws()
             Assert.ThrowsExactly(Of ArgumentNullException)(Sub() ListViewExtensions.ExportToCSV(Nothing))
@@ -125,11 +111,9 @@ Namespace DevCaseTests
 
 #Region " EscapeCsvField "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Plain values are returned unchanged.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow("Saxon", "Saxon")>
         <DataRow("Wheels of Steel", "Wheels of Steel")>
@@ -138,11 +122,9 @@ Namespace DevCaseTests
             Assert.AreEqual(expected, ListViewExtensions.EscapeCsvField(value))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Values with separators, double quotes or line breaks are quoted, and inner double quotes are doubled.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow("a,b", """a,b""")>
         <DataRow("say ""hi""", """say """"hi""""""")>
@@ -152,11 +134,9 @@ Namespace DevCaseTests
             Assert.AreEqual(expected, ListViewExtensions.EscapeCsvField(value))
         End Sub
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Null and empty values produce an empty field.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         <TestMethod>
         <DataRow(Nothing)>
         <DataRow("")>
@@ -168,11 +148,9 @@ Namespace DevCaseTests
 
 #Region " Private Methods "
 
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <summary>
         ''' Creates a <see cref="ListView"/> in details view with the specified columns and rows.
         ''' </summary>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <param name="columns">
         ''' The column names.
         ''' </param>
@@ -180,11 +158,9 @@ Namespace DevCaseTests
         ''' <param name="rows">
         ''' The rows; every row contains the text of its sub-items.
         ''' </param>
-        ''' ----------------------------------------------------------------------------------------------------
         ''' <returns>
         ''' The list view.
         ''' </returns>
-        ''' ----------------------------------------------------------------------------------------------------
         Private Shared Function CreateListView(columns As String(), ParamArray rows As String()()) As ListView
             Dim lv As New ListView() With {.View = View.Details}
             For Each column As String In columns
