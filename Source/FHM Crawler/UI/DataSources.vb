@@ -1,90 +1,65 @@
-﻿Friend Module DataSources
+﻿#Region " Option Statements "
 
-    Friend ReadOnly years As String() =
-        {
-            "all",
-            "1937",
-            "1947",
-            "1949",
-            "1950",
-            "1952",
-            "1953",
-            "1954",
-            "1955",
-            "1956",
-            "1957",
-            "1958",
-            "1959",
-            "1960",
-            "1961",
-            "1962",
-            "1963",
-            "1964",
-            "1965",
-            "1966",
-            "1967",
-            "1968",
-            "1969",
-            "1970",
-            "1971",
-            "1972",
-            "1973",
-            "1974",
-            "1975",
-            "1976",
-            "1977",
-            "1978",
-            "1979",
-            "1980",
-            "1981",
-            "1982",
-            "1983",
-            "1984",
-            "1985",
-            "1986",
-            "1987",
-            "1988",
-            "1989",
-            "1990",
-            "1991",
-            "1992",
-            "1993",
-            "1994",
-            "1995",
-            "1996",
-            "1997",
-            "1998",
-            "1999",
-            "2000",
-            "2001",
-            "2002",
-            "2003",
-            "2004",
-            "2005",
-            "2006",
-            "2007",
-            "2008",
-            "2009",
-            "2010",
-            "2011",
-            "2012",
-            "2013",
-            "2014",
-            "2015",
-            "2016",
-            "2017",
-            "2018",
-            "2019",
-            "2020",
-            "2021",
-            "2022",
-            "2023",
-            "2024",
-            "2025",
-            "2026",
-            "2027"
-    }
+Option Strict On
+Option Explicit On
+Option Infer Off
 
+#End Region
+
+''' <summary>
+''' Provides the values of the search filters (year, genre and country) that the FHM website accepts.
+''' </summary>
+Friend Module DataSources
+
+    ''' <summary>
+    ''' The first release year that can be searched in the FHM website.
+    ''' </summary>
+    Friend Const FirstYear As Integer = 1937
+
+    ''' <summary>
+    ''' Gets the values of the year search filter: <c>"all"</c>,
+    ''' followed by every year from <see cref="DataSources.FirstYear"/> to the current year, in ascending order.
+    ''' </summary>
+    Friend ReadOnly Property years As String()
+        Get
+            Return DataSources.GetYears(DateTime.Now.Year)
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Gets the values of the year search filter: <c>"all"</c>,
+    ''' followed by every year from <see cref="DataSources.FirstYear"/> to the specified last year, in ascending order.
+    ''' </summary>
+    '''
+    ''' <param name="lastYear">
+    ''' The last year of the list (normally, the current year).
+    ''' </param>
+    '''
+    ''' <returns>
+    ''' The values of the year search filter.
+    ''' </returns>
+    '''
+    ''' <exception cref="ArgumentOutOfRangeException">
+    ''' Thrown when <paramref name="lastYear"/> is lower than <see cref="DataSources.FirstYear"/>.
+    ''' </exception>
+    Friend Function GetYears(lastYear As Integer) As String()
+        If lastYear < DataSources.FirstYear Then
+            Throw New ArgumentOutOfRangeException(paramName:=NameOf(lastYear), actualValue:=lastYear,
+                                                  message:=$"The last year cannot be lower than {DataSources.FirstYear}.")
+        End If
+
+        Dim values As String() = New String(lastYear - DataSources.FirstYear + 1) {}
+        values(0) = "all"
+        For index As Integer = 1 To values.Length - 1
+            values(index) = (DataSources.FirstYear + index - 1).ToString(Globalization.CultureInfo.InvariantCulture)
+        Next index
+
+        Return values
+    End Function
+
+    ''' <summary>
+    ''' The values of the genre search filter: <c>"all"</c>, followed by the genres of the FHM website.
+    ''' </summary>
     Friend ReadOnly genres As String() =
         {
             "all",
@@ -242,6 +217,9 @@
             "Viking metal"
     }
 
+    ''' <summary>
+    ''' The values of the country search filter: <c>"all"</c>, followed by the countries of the FHM website, in alphabetical order.
+    ''' </summary>
     Friend ReadOnly countries As String() =
         {
             "all",

@@ -82,6 +82,19 @@ Namespace ApplicationTests
 #Region " Years "
 
         ''' <summary>
+        ''' The year list contains every year from 1937 to the current year, in ascending order, without gaps.
+        ''' </summary>
+        <TestMethod>
+        Public Sub Years_ContainEveryYearFrom1937ToTheCurrentYear()
+            Dim currentYear As Integer = DateTime.Now.Year
+            Dim expected As String() = Enumerable.Range(1937, currentYear - 1937 + 1).
+                                                  Select(Function(year As Integer) year.ToString(CultureInfo.InvariantCulture)).
+                                                  ToArray()
+
+            CollectionAssert.AreEqual(expected, DataSources.years.Skip(1).ToArray())
+        End Sub
+
+        ''' <summary>
         ''' Every year (after <c>"all"</c>) is a four-digit number, sorted in ascending order.
         ''' </summary>
         <TestMethod>
@@ -99,11 +112,31 @@ Namespace ApplicationTests
         End Sub
 
         ''' <summary>
-        ''' Regression test (v1.2.0): the year list is no longer capped at 2018.
+        ''' The year list is built for the specified last year: it is not a fixed list.
         ''' </summary>
         <TestMethod>
-        Public Sub Years_IncludeRecentYears()
-            CollectionAssert.IsSubsetOf({"2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"}, DataSources.years)
+        <DataRow(1937)>
+        <DataRow(2000)>
+        <DataRow(2027)>
+        <DataRow(2150)>
+        Public Sub GetYears_EndsAtTheSpecifiedYear(lastYear As Integer)
+            Dim years As String() = DataSources.GetYears(lastYear)
+
+            Assert.AreEqual("all", years(0))
+            Assert.AreEqual("1937", years(1))
+            Assert.AreEqual(lastYear.ToString(CultureInfo.InvariantCulture), years(years.Length - 1))
+            Assert.AreEqual(lastYear - 1937 + 2, years.Length)
+        End Sub
+
+        ''' <summary>
+        ''' A last year before 1937 is rejected.
+        ''' </summary>
+        <TestMethod>
+        <DataRow(1936)>
+        <DataRow(0)>
+        <DataRow(-1)>
+        Public Sub GetYears_BeforeFirstYear_Throws(lastYear As Integer)
+            Assert.ThrowsExactly(Of ArgumentOutOfRangeException)(Function() DataSources.GetYears(lastYear))
         End Sub
 
 #End Region

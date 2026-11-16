@@ -1,6 +1,34 @@
 ﻿# FHM Crawler (http://freehardmusic.com/) Change Log 📋
 
-## v1.2.1 *(current)* 🆕
+## v2.0 *(current)* 🆕
+
+#### 🎨 User interface:
+ - Redesigned the main window with a clean and consistent layout: a header with the navigation and the theme switch, a search card, a results card with its own toolbar, and a status bar.
+ - Added a dark theme (graphite with a wine red accent) and a light theme (default Windows colors), switchable at any time with the "Dark theme" switch.
+ - The chosen theme is saved in the user settings and restored on the next start. On the first start, the program uses the Windows app theme.
+ - The window title bar is darkened when the dark theme is applied (Windows 10 version 1809 or later).
+ - New flat controls without the white borders of the standard Windows controls: buttons, text box, drop-down lists, album list, theme switch and progress bar.
+ - The tabs were replaced by "Search" and "Browser (log in)" views, and the artist and genre/country/year search modes by a segmented selector that only shows the fields of the selected mode.
+ - The album list shows a sort indicator in the sorted column, alternating row colors, and a message while it is empty; the "Download links" column fills the available width.
+ - The status bar shows the progress of the search page by page. The progress bar keeps its color while a search runs, and turns yellow when the search is cancelled or red when it fails.
+ - Added a "Go to home page" button to the browser view.
+ - Added a GitHub button to the header that opens the repository of the program in the default web browser.
+ - Switching the theme, the view or the search mode redraws the window at once, without white flashing.
+ - Minimum window size adjusted to the new layout.
+
+#### 🔄 Changes:
+ - The "Copy all as CSV" button now uses the semicolon (;) as field delimiter instead of the comma.
+ - Artist names and album titles never contain the CSV delimiter: semicolons are replaced with commas, and line breaks with white-spaces.
+ - The year list is now generated dynamically, from 1937 to the current year, instead of being a fixed list that ended in 2027 and skipped some years.
+
+#### 🛠️ Fixes:
+ - Resolved an issue where every search kept using the session cookies of the first search, so logging in again in the browser had no effect until the program was restarted.
+
+#### 🌟 Improvements:
+ - The artist name is trimmed before searching.
+ - Extended the unit test project to cover the CSV format, the year list, the themes and the new controls.
+
+## v1.2.1 🔄
 
 #### 🛠️ Fixes:
  - Resolved an issue where an extra, empty results page was requested when the number of found albums was an exact multiple of 10.

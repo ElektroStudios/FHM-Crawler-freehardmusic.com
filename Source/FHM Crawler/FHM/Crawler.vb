@@ -690,8 +690,8 @@ Namespace FHM
             End If
 
             ' Remove new lines, and replace tabs and duplicated white-spaces for a single white-space.
-            Dim text As String = Regex.Replace(node.InnerText, "\s+", " ", RegexOptions.None).Trim()
-            Dim match As Match = Regex.Match(text, "\d+", RegexOptions.None)
+            Dim text As String = Regex.Replace(node.InnerText, "\s+", " ", RegexOptions.None, TimeSpan.FromSeconds(30)).Trim()
+            Dim match As Match = Regex.Match(text, "\d+", RegexOptions.None, TimeSpan.FromSeconds(30))
             If Not match.Success Then
                 Throw New FormatException($"The album count could not be found in the search result summary: '{text}'.")
             End If

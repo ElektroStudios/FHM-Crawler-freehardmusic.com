@@ -29,7 +29,8 @@ Namespace DevCaseTests
 #Region " ExportToCSV "
 
         ''' <summary>
-        ''' The first line contains the column names and every item produces one line, in order.
+        ''' The first line contains the column names and every item produces one line, in order,
+        ''' using the semicolon as the default delimiter.
         ''' </summary>
         <TestMethod>
         Public Sub ExportToCSV_WritesHeaderAndRowsInOrder()
@@ -37,7 +38,7 @@ Namespace DevCaseTests
                                                                           {"Saxon", "Wheels of Steel"},
                                                                           {"Dio", "Holy Diver"})
 
-                Dim expected As String = String.Join(Environment.NewLine, "Artist,Title", "Saxon,Wheels of Steel", "Dio,Holy Diver", "")
+                Dim expected As String = String.Join(Environment.NewLine, "Artist;Title", "Saxon;Wheels of Steel", "Dio;Holy Diver", "")
 
                 Assert.AreEqual(expected, lv.ExportToCSV())
             End Using
@@ -50,7 +51,7 @@ Namespace DevCaseTests
         Public Sub ExportToCSV_NoItems_WritesOnlyTheHeader()
             Using lv As ListView = ListViewExtensionsTests.CreateListView({"Artist", "Title"})
 
-                Assert.AreEqual($"Artist,Title{Environment.NewLine}", lv.ExportToCSV())
+                Assert.AreEqual($"Artist;Title{Environment.NewLine}", lv.ExportToCSV())
             End Using
         End Sub
 
@@ -64,7 +65,7 @@ Namespace DevCaseTests
 
                 Dim lines As String() = lv.ExportToCSV(defaultValueIfEmpty:="N/A").Split({Environment.NewLine}, StringSplitOptions.None)
 
-                Assert.AreEqual("Saxon,N/A,1980", lines(1))
+                Assert.AreEqual("Saxon;N/A;1980", lines(1))
             End Using
         End Sub
 
@@ -79,23 +80,66 @@ Namespace DevCaseTests
 
                 Dim lines As String() = lv.ExportToCSV(defaultValueIfEmpty:="-").Split({Environment.NewLine}, StringSplitOptions.None)
 
-                Assert.AreEqual("Saxon,-,-", lines(1))
+                Assert.AreEqual("Saxon;-;-", lines(1))
             End Using
         End Sub
 
         ''' <summary>
-        ''' Values containing commas, double quotes or line breaks are escaped (RFC 4180),
+        ''' Commas are not special with the semicolon delimiter: values containing commas are not quoted.
+        ''' </summary>
+        <TestMethod>
+        Public Sub ExportToCSV_Commas_AreNotQuoted()
+            Using lv As ListView = ListViewExtensionsTests.CreateListView({"Artist", "Links"},
+                                                                          {"Crosby, Stills & Nash", "{http://host/a, http://host/b}"})
+
+                Dim lines As String() = lv.ExportToCSV().Split({Environment.NewLine}, StringSplitOptions.None)
+
+                Assert.AreEqual("Crosby, Stills & Nash;{http://host/a, http://host/b}", lines(1))
+            End Using
+        End Sub
+
+        ''' <summary>
+        ''' Values containing the delimiter, double quotes or line breaks are escaped (RFC 4180),
         ''' so they do not break the column layout of the CSV.
         ''' </summary>
         <TestMethod>
         Public Sub ExportToCSV_SpecialCharacters_AreEscaped()
-            Using lv As ListView = ListViewExtensionsTests.CreateListView({"Artist, Band", "Title"},
-                                                                          {"Crosby, Stills & Nash", "Say ""Hello"""})
+            Using lv As ListView = ListViewExtensionsTests.CreateListView({"Artist; Band", "Title"},
+                                                                          {"A;B", "Say ""Hello"""})
 
                 Dim lines As String() = lv.ExportToCSV().Split({Environment.NewLine}, StringSplitOptions.None)
 
-                Assert.AreEqual("""Artist, Band"",Title", lines(0))
-                Assert.AreEqual("""Crosby, Stills & Nash"",""Say """"Hello""""""", lines(1))
+                Assert.AreEqual("""Artist; Band"";Title", lines(0))
+                Assert.AreEqual("""A;B"";""Say """"Hello""""""", lines(1))
+            End Using
+        End Sub
+
+        ''' <summary>
+        ''' A custom delimiter is used to separate and escape the fields.
+        ''' </summary>
+        <TestMethod>
+        Public Sub ExportToCSV_CustomDelimiter_IsUsed()
+            Using lv As ListView = ListViewExtensionsTests.CreateListView({"Artist", "Title"},
+                                                                          {"Crosby, Stills & Nash", "Deja Vu"})
+
+                Dim lines As String() = lv.ExportToCSV(delimiter:=","c).Split({Environment.NewLine}, StringSplitOptions.None)
+
+                Assert.AreEqual("Artist,Title", lines(0))
+                Assert.AreEqual("""Crosby, Stills & Nash"",Deja Vu", lines(1))
+            End Using
+        End Sub
+
+        ''' <summary>
+        ''' Double quotes and line breaks are rejected as delimiters.
+        ''' </summary>
+        <TestMethod>
+        <DataRow(""""c)>
+        <DataRow(ControlChars.Cr)>
+        <DataRow(ControlChars.Lf)>
+        Public Sub ExportToCSV_InvalidDelimiter_Throws(delimiter As Char)
+            Using lv As ListView = ListViewExtensionsTests.CreateListView({"Artist"})
+
+                Assert.ThrowsExactly(Of ArgumentException)(Function() lv.ExportToCSV(delimiter:=delimiter))
             End Using
         End Sub
 
@@ -118,20 +162,21 @@ Namespace DevCaseTests
         <DataRow("Saxon", "Saxon")>
         <DataRow("Wheels of Steel", "Wheels of Steel")>
         <DataRow("AC/DC", "AC/DC")>
+        <DataRow("a,b", "a,b")>
         Public Sub EscapeCsvField_PlainValue_IsUnchanged(value As String, expected As String)
-            Assert.AreEqual(expected, ListViewExtensions.EscapeCsvField(value))
+            Assert.AreEqual(expected, ListViewExtensions.EscapeCsvField(value, ";"c))
         End Sub
 
         ''' <summary>
-        ''' Values with separators, double quotes or line breaks are quoted, and inner double quotes are doubled.
+        ''' Values with the delimiter, double quotes or line breaks are quoted, and inner double quotes are doubled.
         ''' </summary>
         <TestMethod>
-        <DataRow("a,b", """a,b""")>
+        <DataRow("a;b", """a;b""")>
         <DataRow("say ""hi""", """say """"hi""""""")>
         <DataRow("line1" & vbCrLf & "line2", """line1" & vbCrLf & "line2""")>
         <DataRow("line1" & vbLf & "line2", """line1" & vbLf & "line2""")>
         Public Sub EscapeCsvField_SpecialValue_IsQuoted(value As String, expected As String)
-            Assert.AreEqual(expected, ListViewExtensions.EscapeCsvField(value))
+            Assert.AreEqual(expected, ListViewExtensions.EscapeCsvField(value, ";"c))
         End Sub
 
         ''' <summary>
@@ -141,10 +186,12 @@ Namespace DevCaseTests
         <DataRow(Nothing)>
         <DataRow("")>
         Public Sub EscapeCsvField_NullOrEmpty_ReturnsEmptyString(value As String)
-            Assert.AreEqual(String.Empty, ListViewExtensions.EscapeCsvField(value))
+            Assert.AreEqual(String.Empty, ListViewExtensions.EscapeCsvField(value, ";"c))
         End Sub
 
 #End Region
+
+
 
 #Region " Private Methods "
 

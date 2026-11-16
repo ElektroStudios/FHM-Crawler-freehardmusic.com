@@ -101,6 +101,27 @@
     <Compile Include="FHM\PageCrawlEndEventArgs.vb" />
     <Compile Include="FHM\SearchQuery.vb" />
     <Compile Include="UI\DataSources.vb" />
+    <Compile Include="UI\Controls\IconButton.vb" />
+    <Compile Include="UI\RedrawScope.vb" />
+    <Compile Include="DevCase\Win32\RedrawWindowFlags.vb" />
+    <Compile Include="DevCase\Win32\DwmWindowAttribute.vb" />
+    <Compile Include="DevCase\Win32\SetWindowPosFlags.vb" />
+    <Compile Include="UI\AlbumCsvFormat.vb" />
+    <Compile Include="UI\Controls\BorderSides.vb" />
+    <Compile Include="UI\Controls\CardPanel.vb" />
+    <Compile Include="UI\Controls\FlatProgressBar.vb" />
+    <Compile Include="UI\Controls\ProgressBarState.vb" />
+    <Compile Include="UI\Controls\SegmentButton.vb" />
+    <Compile Include="UI\Controls\SegmentButtonStyle.vb" />
+    <Compile Include="UI\Controls\ThemedButton.vb" />
+    <Compile Include="UI\Controls\ThemedComboBox.vb" />
+    <Compile Include="UI\Controls\ThemedListView.vb" />
+    <Compile Include="UI\Controls\ThemedTextBox.vb" />
+    <Compile Include="UI\Controls\ToggleSwitch.vb" />
+    <Compile Include="UI\Theming\AppTheme.vb" />
+    <Compile Include="UI\Theming\IThemeable.vb" />
+    <Compile Include="UI\Theming\ThemeManager.vb" />
+    <Compile Include="UI\Theming\ThemePalette.vb" />
     <Compile Include="FHM\Crawler.vb" />
     <Compile Include="UI\Main.vb">
       <SubType>Form</SubType>
@@ -149,6 +170,8 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="App.config" />
+    <None Include="Resources\GitHub_Invertocat_Black.png" />
+    <None Include="Resources\GitHub_Invertocat_White.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.ico" />

@@ -77,24 +77,40 @@ Namespace DevCase.Core.Extensions.[ListView]
         ''' A default value to write in a <c>CSV</c> field 
         ''' if the corresponding <see cref="ListViewSubItem"/> value is <see langword="Nothing"/>.
         ''' </param>
+        '''
+        ''' <param name="delimiter">
+        ''' The field delimiter. Default value is the semicolon (<c>;</c>).
+        ''' <para></para>
+        ''' It cannot be a double quote or a line break character.
+        ''' </param>
         ''' <returns>
         ''' The resulting <c>CSV</c> table string.
         ''' </returns>
+        ''' <exception cref="ArgumentNullException">
+        ''' Thrown when <paramref name="sender"/> is <see langword="Nothing"/>.
+        ''' </exception>
+        '''
+        ''' <exception cref="ArgumentException">
+        ''' Thrown when <paramref name="delimiter"/> is a double quote or a line break character.
+        ''' </exception>
         <DebuggerStepThrough>
         <Extension>
         <EditorBrowsable(EditorBrowsableState.Always)>
         Public Function ExportToCSV(sender As WinForms.ListView,
-                                    Optional defaultValueIfEmpty As String = "") As String
+                                    Optional defaultValueIfEmpty As String = "",
+                                    Optional delimiter As Char = ";"c) As String
 
             If sender Is Nothing Then
                 Throw New ArgumentNullException(paramName:=NameOf(sender))
             End If
+            ListViewExtensions.ValidateCsvDelimiter(delimiter)
 
+            Dim separator As String = delimiter.ToString()
             Dim sb As New Text.StringBuilder()
 
             ' Add the column names to the CSV.
-            sb.Append(String.Join(",", From col As ColumnHeader In sender.Columns.Cast(Of ColumnHeader)()
-                                       Select ListViewExtensions.EscapeCsvField(col.Text)))
+            sb.Append(String.Join(separator, From col As ColumnHeader In sender.Columns.Cast(Of ColumnHeader)()
+                                             Select ListViewExtensions.EscapeCsvField(col.Text, delimiter)))
             sb.AppendLine()
 
             ' Add the item values to the CSV.
@@ -103,15 +119,15 @@ Namespace DevCase.Core.Extensions.[ListView]
                 Dim fields As New List(Of String)
 
                 For Each cell As ListViewSubItem In row.SubItems
-                    fields.Add(ListViewExtensions.EscapeCsvField(If(String.IsNullOrEmpty(cell.Text), defaultValueIfEmpty, cell.Text)))
+                    fields.Add(ListViewExtensions.EscapeCsvField(If(String.IsNullOrEmpty(cell.Text), defaultValueIfEmpty, cell.Text), delimiter))
                 Next cell
 
                 ' Fill the missing sub-items with the default value.
                 Do While fields.Count < sender.Columns.Count
-                    fields.Add(ListViewExtensions.EscapeCsvField(defaultValueIfEmpty))
+                    fields.Add(ListViewExtensions.EscapeCsvField(defaultValueIfEmpty, delimiter))
                 Loop
 
-                sb.Append(String.Join(",", fields))
+                sb.Append(String.Join(separator, fields))
                 sb.AppendLine()
 
             Next row
@@ -209,29 +225,49 @@ subItemIndex As Integer)
 
         ''' <summary>
         ''' Escapes a field value following the <c>CSV</c> rules (RFC 4180):
-        ''' values containing commas, double quotes or line breaks are enclosed in double quotes,
+        ''' values containing the delimiter, double quotes or line breaks are enclosed in double quotes,
         ''' and the inner double quotes are doubled.
         ''' </summary>
         ''' <param name="value">
         ''' The field value.
         ''' </param>
+        '''
+        ''' <param name="delimiter">
+        ''' The field delimiter.
+        ''' </param>
         ''' <returns>
         ''' The escaped field value.
         ''' </returns>
         <DebuggerStepThrough>
-        Friend Function EscapeCsvField(value As String) As String
+        Friend Function EscapeCsvField(value As String, delimiter As Char) As String
 
             If String.IsNullOrEmpty(value) Then
                 Return String.Empty
             End If
 
-            If value.IndexOfAny({","c, """"c, ControlChars.Cr, ControlChars.Lf}) = -1 Then
+            If value.IndexOfAny({delimiter, """"c, ControlChars.Cr, ControlChars.Lf}) = -1 Then
                 Return value
             End If
 
             Return $"""{value.Replace("""", """""")}"""
 
         End Function
+
+        ''' <summary>
+        ''' Validates a <c>CSV</c> field delimiter.
+        ''' </summary>
+        ''' <param name="delimiter">
+        ''' The field delimiter.
+        ''' </param>
+        ''' <exception cref="ArgumentException">
+        ''' Thrown when <paramref name="delimiter"/> is a double quote or a line break character.
+        ''' </exception>
+        <DebuggerStepThrough>
+        Friend Sub ValidateCsvDelimiter(delimiter As Char)
+            If delimiter = """"c OrElse delimiter = ControlChars.Cr OrElse delimiter = ControlChars.Lf Then
+                Throw New ArgumentException("The CSV delimiter cannot be a double quote or a line break character.", paramName:=NameOf(delimiter))
+            End If
+        End Sub
 
 #End Region
 
