@@ -77,6 +77,9 @@ Browsing through large media repositories on websites like FHM is a grind. When 
 
 ## 🎦 Videos
 
+> [!NOTE]
+> This video was recorded using a version prior to 2.0.
+
 [FHM Crawler Demo](https://github.com/user-attachments/assets/9897b6db-0121-43aa-8358-c9e6f12a7d4f)
 
 ## 📝 Requirements
