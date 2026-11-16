@@ -11,11 +11,14 @@
  - Resolved an issue where the text column sorter ignored its own rules for empty values, falling back to the default comparison.
  - The "Copy All Items As CSV" button now escapes values that contain commas, double quotes or line breaks, so they no longer break the CSV columns.
  - Resolved a crash (ArgumentOutOfRangeException) when building a query string from an empty parameter collection.
+ - Resolved an issue where the network resources used by the crawler were not released when the program was closed.
 
 #### 🌟 Improvements:
  - Albums whose download links cannot be retrieved (network error or malformed response) are skipped as before, but any other unexpected error is no longer silently ignored.
  - The album identifier is now extracted from the album links in a more robust way.
  - The crawler events are raised on the UI thread, while the network and parsing work no longer runs on it.
+ - Reworked the crawler API: the search query now provides its URL and validates that an artist name is not combined with country, genre or year criteria; the album information now includes the album identifier and its URL; the crawl events now provide the search query and the search page index.
+ - Extended the XML documentation of the crawler classes, including a usage example.
  - Added a unit test project (MSTest) that covers the crawler (search queries, HTML/XML parsing, paging, cancellation and events, using a fake web server instead of real network access), the list view sorting and CSV export, the query string builder, the comparers, the tab control extensions, the cookie-aware web client and the search filter data sources.
  - Minor code changes and optimizations.
 
