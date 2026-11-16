@@ -1,8 +1,79 @@
-﻿#Region " Option Statements "
+﻿' ***********************************************************************
+' Author   : ElektroStudios
+' Modified : 15-November-2026
+' ***********************************************************************
+
+#Region " Option Statements "
 
 Option Strict On
 Option Explicit On
 Option Infer Off
+
+#End Region
+
+#Region " Usage Example "
+
+' Imports System.Net
+' Imports System.Text
+' Imports System.Threading
+'
+' Imports FHM
+'
+' Public Module Module1
+'
+'     ' The FHM website requires a logged-in session:
+'     ' the container must hold the session cookies of a logged-in FHM user.
+'     Private ReadOnly SessionCookies As New CookieContainer()
+'
+'     Private WithEvents FHMCrawler As New Crawler(SessionCookies)
+'     Private ReadOnly mre As New ManualResetEvent(initialState:=False)
+'
+'     Public Sub Main()
+'         FHMCrawler.SearchQuery.Artist = "Linkin Park"
+'
+'         Console.WriteLine($"Search Params: {FHMCrawler.SearchQuery}")
+'         Console.WriteLine()
+'         Console.WriteLine($"Absolute Uri: {FHMCrawler.SearchQuery.Uri.AbsoluteUri}")
+'         Console.WriteLine()
+'         Console.WriteLine("Retrieving Album count...")
+'         Dim albumCount As Integer = FHMCrawler.GetAlbumCount()
+'         Console.WriteLine($"Album Count: {albumCount}")
+'         Console.WriteLine()
+'         Console.WriteLine("Begin crawling, please wait...")
+'         Fetch()
+'         mre.WaitOne()
+'         FHMCrawler.Dispose()
+'         Console.WriteLine("Done!. Press any key to exit...")
+'         Console.ReadKey()
+'     End Sub
+'
+'     Public Async Sub Fetch()
+'         Dim success As Boolean = Await FHMCrawler.FetchAlbumsAsync()
+'         mre.Set()
+'     End Sub
+'
+'     <DebuggerStepperBoundary>
+'     Private Sub FHMCrawler_PageCrawlBegin(sender As Object, e As PageCrawlBeginEventArgs) Handles FHMCrawler.PageCrawlBegin
+'         Console.WriteLine($"[+] Begin crawling page with index: {e.SearchPage}")
+'         Console.WriteLine()
+'     End Sub
+'
+'     <DebuggerStepperBoundary>
+'     Private Sub FHMCrawler_PageCrawlEnd(sender As Object, e As PageCrawlEndEventArgs) Handles FHMCrawler.PageCrawlEnd
+'         For Each albumInfo As AlbumInfo In e.Albums
+'             Dim sb As New StringBuilder()
+'             sb.AppendLine($"Artist Name.....: {albumInfo.Artist}")
+'             sb.AppendLine($"Album Title.....: {albumInfo.Title}")
+'             sb.AppendLine($"Album Id........: {albumInfo.Id}")
+'             sb.AppendLine($"Album Url.......: {albumInfo.Uri.AbsoluteUri}")
+'             sb.AppendLine($"Download Link(s): {{ {String.Join(", ", albumInfo.DownloadLinks)} }}")
+'             Console.WriteLine(sb.ToString())
+'         Next albumInfo
+'         Console.WriteLine($"[+] End crawling page with index: {e.SearchPage}")
+'         Console.WriteLine()
+'     End Sub
+'
+' End Module
 
 #End Region
 
@@ -33,10 +104,79 @@ Imports DevCase.Core.Extensions.NameValueCollection
 Namespace FHM
 
     ''' <summary>
-    ''' A simple crawler that collects the download urls of the Rock albums published on the
-    ''' <c>http://freehardmusic.com/</c> website.
+    ''' A crawler that searchs and collect albums (its download links) from the http://freehardmusic.com/ website.
     ''' </summary>
-    Public NotInheritable Class Crawler
+    '''
+    ''' <remarks>
+    ''' Note: Some functionalities of this assembly may require to install one or all of the listed NuGet packages:
+    ''' <para></para>
+    ''' <see href="https://www.nuget.org/packages/HtmlAgilityPack">HtmlAgilityPack</see>
+    ''' </remarks>
+    '''
+    ''' <example> This is a code example.
+    ''' <code language="VB.NET">
+    ''' Imports System.Net
+    ''' Imports System.Text
+    ''' Imports System.Threading
+    '''
+    ''' Imports FHM
+    '''
+    ''' Public Module Module1
+    '''
+    '''     ' The FHM website requires a logged-in session:
+    '''     ' the container must hold the session cookies of a logged-in FHM user.
+    '''     Private ReadOnly SessionCookies As New CookieContainer()
+    '''
+    '''     Private WithEvents FHMCrawler As New Crawler(SessionCookies)
+    '''     Private ReadOnly mre As New ManualResetEvent(initialState:=False)
+    '''
+    '''     Public Sub Main()
+    '''         FHMCrawler.SearchQuery.Artist = "Linkin Park"
+    '''
+    '''         Console.WriteLine($"Search Params: {FHMCrawler.SearchQuery}")
+    '''         Console.WriteLine()
+    '''         Console.WriteLine($"Absolute Uri: {FHMCrawler.SearchQuery.Uri.AbsoluteUri}")
+    '''         Console.WriteLine()
+    '''         Console.WriteLine("Retrieving Album count...")
+    '''         Dim albumCount As Integer = FHMCrawler.GetAlbumCount()
+    '''         Console.WriteLine($"Album Count: {albumCount}")
+    '''         Console.WriteLine()
+    '''         Console.WriteLine("Begin crawling, please wait...")
+    '''         Fetch()
+    '''         mre.WaitOne()
+    '''         FHMCrawler.Dispose()
+    '''         Console.WriteLine("Done!. Press any key to exit...")
+    '''         Console.ReadKey()
+    '''     End Sub
+    '''
+    '''     Public Async Sub Fetch()
+    '''         Dim success As Boolean = Await FHMCrawler.FetchAlbumsAsync()
+    '''         mre.Set()
+    '''     End Sub
+    '''
+    '''     Private Sub FHMCrawler_PageCrawlBegin(sender As Object, e As PageCrawlBeginEventArgs) Handles FHMCrawler.PageCrawlBegin
+    '''         Console.WriteLine($"[+] Begin crawling page with index: {e.SearchPage}")
+    '''         Console.WriteLine()
+    '''     End Sub
+    '''
+    '''     Private Sub FHMCrawler_PageCrawlEnd(sender As Object, e As PageCrawlEndEventArgs) Handles FHMCrawler.PageCrawlEnd
+    '''         For Each albumInfo As AlbumInfo In e.Albums
+    '''             Dim sb As New StringBuilder()
+    '''             sb.AppendLine($"Artist Name.....: {albumInfo.Artist}")
+    '''             sb.AppendLine($"Album Title.....: {albumInfo.Title}")
+    '''             sb.AppendLine($"Album Id........: {albumInfo.Id}")
+    '''             sb.AppendLine($"Album Url.......: {albumInfo.Uri.AbsoluteUri}")
+    '''             sb.AppendLine($"Download Link(s): {{ {String.Join(", ", albumInfo.DownloadLinks)} }}")
+    '''             Console.WriteLine(sb.ToString())
+    '''         Next albumInfo
+    '''         Console.WriteLine($"[+] End crawling page with index: {e.SearchPage}")
+    '''         Console.WriteLine()
+    '''     End Sub
+    '''
+    ''' End Module
+    ''' </code>
+    ''' </example>
+    Public Class Crawler : Implements IDisposable
 
 #Region " Constants "
 
@@ -80,17 +220,18 @@ Namespace FHM
 #Region " Private Fields "
 
         ''' <summary>
-        ''' The base address of the FHM website.
+        ''' The <see cref="Uri"/> that points to "http://freehardmusic.com/".
         ''' </summary>
         Friend Shared ReadOnly UriBase As New Uri("http://freehardmusic.com/")
 
         ''' <summary>
-        ''' The address of the FHM search page.
+        ''' The <see cref="Uri"/> that points to "http://freehardmusic.com/index.php" (the search page).
         ''' </summary>
         Friend Shared ReadOnly UriIndex As New Uri(Crawler.UriBase, "/index.php")
 
         ''' <summary>
-        ''' The address of the FHM page that returns the download links of an album (as XML).
+        ''' The <see cref="Uri"/> that points to "http://freehardmusic.com/index2.php"
+        ''' (the page that returns the download links of an album, as XML).
         ''' </summary>
         Friend Shared ReadOnly UriIndex2 As New Uri(Crawler.UriBase, "/index2.php")
 
@@ -126,17 +267,18 @@ Namespace FHM
         Private cookiesValue As CookieContainer
 
         ''' <summary>
-        ''' The source of the cancellation token of the current fetch operation.
+        ''' The <see cref="CancellationTokenSource"/> instance that signals to <see cref="Crawler.cancelToken"/>.
         ''' </summary>
         Private cancelTokenSrc As CancellationTokenSource
 
         ''' <summary>
-        ''' The cancellation token of the current fetch operation.
+        ''' The <see cref="CancellationToken"/> instance that cancels a pending fetch operation
+        ''' started by a call of <see cref="Crawler.FetchAlbumsAsync()"/>.
         ''' </summary>
         Private cancelToken As CancellationToken
 
         ''' <summary>
-        ''' A flag (<c>0</c> or <c>1</c>) that indicates whether a fetch operation is running.
+        ''' Flag (<c>0</c> or <c>1</c>) that determines whether this <see cref="Crawler"/> is busy in a pending fetch operation.
         ''' <para></para>
         ''' It is an <see cref="Integer"/> to allow atomic updates through <see cref="Interlocked"/>.
         ''' </summary>
@@ -145,7 +287,7 @@ Namespace FHM
         ''' <summary>
         ''' The <see cref="SynchronizationContext"/> captured when the current fetch operation started.
         ''' <para></para>
-        ''' The <see cref="Crawler.BeginPageCrawl"/> and <see cref="Crawler.EndPageCrawl"/> events are raised on it,
+        ''' The <see cref="Crawler.PageCrawlBegin"/> and <see cref="Crawler.PageCrawlEnd"/> events are raised on it,
         ''' so UI event handlers keep running on the UI thread even though the crawler uses <c>ConfigureAwait(False)</c>.
         ''' </summary>
         Private eventContext As SynchronizationContext
@@ -155,13 +297,22 @@ Namespace FHM
 #Region " Properties "
 
         ''' <summary>
-        ''' Gets the search filter used by the crawler.
+        ''' Gets the search query.
         ''' </summary>
-        Public ReadOnly Property SearchFilter As SearchFilter
+        '''
+        ''' <value>
+        ''' The search query.
+        ''' </value>
+        Public ReadOnly Property SearchQuery As SearchQuery
 
         ''' <summary>
         ''' Gets or sets the session cookies sent to the FHM website.
         ''' </summary>
+        '''
+        ''' <value>
+        ''' The session cookies sent to the FHM website.
+        ''' </value>
+        '''
         ''' <exception cref="ArgumentNullException">
         ''' Thrown when the value is <see langword="Nothing"/>.
         ''' </exception>
@@ -179,8 +330,12 @@ Namespace FHM
         End Property
 
         ''' <summary>
-        ''' Gets a value indicating whether a fetch operation is currently running.
+        ''' Gets a value that determines whether this <see cref="Crawler"/> is busy in a pending fetch operation.
         ''' </summary>
+        '''
+        ''' <value>
+        ''' <see langword="True"/> if a fetch operation is running; otherwise, <see langword="False"/>.
+        ''' </value>
         Public ReadOnly Property IsFetching As Boolean
             Get
                 Return Volatile.Read(Me.fetchingFlag) = 1
@@ -192,14 +347,14 @@ Namespace FHM
 #Region " Events "
 
         ''' <summary>
-        ''' Occurs when the crawler begins parsing a search results page.
+        ''' Occurs when a page is about to be crawled.
         ''' </summary>
-        Public Event BeginPageCrawl As EventHandler(Of PageCrawlBeginEventArgs)
+        Public Event PageCrawlBegin As EventHandler(Of PageCrawlBeginEventArgs)
 
         ''' <summary>
-        ''' Occurs when the crawler finishes parsing a search results page.
+        ''' Occurs when a page is crawled.
         ''' </summary>
-        Public Event EndPageCrawl As EventHandler(Of PageCrawlEndEventArgs)
+        Public Event PageCrawlEnd As EventHandler(Of PageCrawlEndEventArgs)
 
 #End Region
 
@@ -208,9 +363,11 @@ Namespace FHM
         ''' <summary>
         ''' Initializes a new instance of the <see cref="Crawler"/> class.
         ''' </summary>
+        '''
         ''' <param name="cookies">
-        ''' The session cookies sent to the FHM website.
+        ''' The session cookies sent to the FHM website (the FHM website requires a logged-in session).
         ''' </param>
+        '''
         ''' <exception cref="ArgumentNullException">
         ''' Thrown when <paramref name="cookies"/> is <see langword="Nothing"/>.
         ''' </exception>
@@ -225,7 +382,7 @@ Namespace FHM
             Me.cookiesValue = cookies
             Me.downloadStringAsync = Function(address As Uri) Me.client.DownloadStringTaskAsync(address)
 
-            Me.SearchFilter = New SearchFilter()
+            Me.SearchQuery = New SearchQuery()
             Me.cancelTokenSrc = New CancellationTokenSource()
             Me.cancelToken = Me.cancelTokenSrc.Token
         End Sub
@@ -236,6 +393,7 @@ Namespace FHM
         ''' <para></para>
         ''' This constructor exists for unit testing purposes.
         ''' </summary>
+        '''
         ''' <param name="cookies">
         ''' The session cookies sent to the FHM website.
         ''' </param>
@@ -243,6 +401,7 @@ Namespace FHM
         ''' <param name="downloadStringAsync">
         ''' The delegate that downloads the content of an <see cref="Uri"/> as a string.
         ''' </param>
+        '''
         ''' <exception cref="ArgumentNullException">
         ''' Thrown when <paramref name="cookies"/> or <paramref name="downloadStringAsync"/> is <see langword="Nothing"/>.
         ''' </exception>
@@ -260,52 +419,82 @@ Namespace FHM
 #Region " Public Methods "
 
         ''' <summary>
-        ''' Gets the amount of albums that match the current <see cref="Crawler.SearchFilter"/>.
+        ''' Gets the count of the albums found using the current search query.
         ''' </summary>
+        '''
         ''' <returns>
-        ''' The amount of albums that match the current search filter.
+        ''' The count of the albums found using the current search query.
         ''' </returns>
-        Public Function GetAlbumCount() As Integer
-            Dim t As Task(Of Integer) = Task.Run(Of Integer)(AddressOf Me.GetAlbumCountAsync)
-            t.Wait()
+        '''
+        ''' <exception cref="ObjectDisposedException">
+        ''' Thrown when this instance has been disposed.
+        ''' </exception>
+        Public Overridable Function GetAlbumCount() As Integer
+            Me.ThrowIfDisposed()
 
-            Return t.Result
+            ' Runs on a thread-pool thread to avoid deadlocks when called from a UI thread;
+            ' GetResult() throws the original exception instead of an AggregateException.
+            Return Task.Run(Of Integer)(AddressOf Me.GetAlbumCountAsync).GetAwaiter().GetResult()
         End Function
 
         ''' <summary>
-        ''' Asynchronously gets the amount of albums that match the current <see cref="Crawler.SearchFilter"/>.
+        ''' Asynchronously gets the count of the albums found using the current search query.
         ''' </summary>
+        '''
         ''' <returns>
-        ''' The amount of albums that match the current search filter.
+        ''' The count of the albums found using the current search query.
         ''' </returns>
-        Public Async Function GetAlbumCountAsync() As Task(Of Integer)
-            Dim uriSearch As New Uri(Crawler.BuildSearchQuery(Me.SearchFilter, pageIndex:=0))
-            Dim htmlSourceCode As String = Await Me.DownloadAsync(uriSearch).ConfigureAwait(False)
+        '''
+        ''' <exception cref="ObjectDisposedException">
+        ''' Thrown when this instance has been disposed.
+        ''' </exception>
+        Public Overridable Async Function GetAlbumCountAsync() As Task(Of Integer)
+            Me.ThrowIfDisposed()
 
+            Dim htmlSourceCode As String = Await Me.DownloadAsync(Me.SearchQuery.Uri(searchPage:=0)).ConfigureAwait(False)
             Return Crawler.ParseAlbumCount(htmlSourceCode)
         End Function
 
         ''' <summary>
-        ''' Fetches all the albums that match the current <see cref="Crawler.SearchFilter"/>.
+        ''' Fetch any album found using the current search query.
         ''' </summary>
-        Public Sub FetchAlbums()
-            Dim t As Task = Task.Run(AddressOf Me.FetchAlbumsAsync)
-            t.Wait()
-        End Sub
-
-        ''' <summary>
-        ''' Asynchronously fetches all the albums that match the current <see cref="Crawler.SearchFilter"/>.
-        ''' <para></para>
-        ''' The albums of every page are delivered through the <see cref="Crawler.EndPageCrawl"/> event.
-        ''' </summary>
-        ''' <returns>
-        ''' <see langword="True"/> if the operation completed;
-        ''' <see langword="False"/> if it was cancelled by a call to <see cref="Crawler.CancelFetchAlbumsAsync"/>.
-        ''' </returns>
+        '''
+        ''' <exception cref="ObjectDisposedException">
+        ''' Thrown when this instance has been disposed.
+        ''' </exception>
+        '''
         ''' <exception cref="InvalidOperationException">
         ''' Thrown when another fetch operation is already running.
         ''' </exception>
-        Public Async Function FetchAlbumsAsync() As Task(Of Boolean)
+        Public Overridable Sub FetchAlbums()
+            Me.ThrowIfDisposed()
+
+            ' Runs on a thread-pool thread to avoid deadlocks when called from a UI thread;
+            ' GetResult() throws the original exception instead of an AggregateException.
+            Task.Run(Of Boolean)(AddressOf Me.FetchAlbumsAsync).GetAwaiter().GetResult()
+        End Sub
+
+        ''' <summary>
+        ''' Asynchronously fetch any album found using the current search query.
+        ''' <para></para>
+        ''' The albums of every search page are delivered through the <see cref="Crawler.PageCrawlEnd"/> event.
+        ''' </summary>
+        '''
+        ''' <returns>
+        ''' Returns <see langword="False"/> if the fetch operation was canceled by a call to
+        ''' <see cref="Crawler.CancelFetchAlbumsAsync()"/> method; otherwise, <see langword="True"/>.
+        ''' </returns>
+        '''
+        ''' <exception cref="ObjectDisposedException">
+        ''' Thrown when this instance has been disposed.
+        ''' </exception>
+        '''
+        ''' <exception cref="InvalidOperationException">
+        ''' Thrown when another fetch operation is already running in background.
+        ''' </exception>
+        Public Overridable Async Function FetchAlbumsAsync() As Task(Of Boolean)
+            Me.ThrowIfDisposed()
+
             If Interlocked.CompareExchange(Me.fetchingFlag, 1, 0) <> 0 Then
                 Throw New InvalidOperationException("Another fetch operation is already running in background.")
             End If
@@ -321,21 +510,18 @@ Namespace FHM
                 Dim albumCount As Integer = Await Me.GetAlbumCountAsync().ConfigureAwait(False)
                 Dim pageCount As Integer = Crawler.GetPageCount(albumCount)
 
-                For pageIndex As Integer = 0 To (pageCount - 1)
-                    Dim currentPageIndex As Integer = pageIndex
-                    Dim uriSearch As New Uri(Crawler.BuildSearchQuery(Me.SearchFilter, currentPageIndex))
-                    Dim htmlSourceCode As String = Await Me.DownloadAsync(uriSearch).ConfigureAwait(False)
+                For searchPage As Integer = 0 To (pageCount - 1)
+                    Dim currentSearchPage As Integer = searchPage
+                    Dim htmlSourceCode As String = Await Me.DownloadAsync(Me.SearchQuery.Uri(currentSearchPage)).ConfigureAwait(False)
 
                     If Me.cancelToken.IsCancellationRequested Then
                         Return False
                     End If
 
-                    Me.InvokeOnEventContext(Sub() RaiseEvent BeginPageCrawl(Me, New PageCrawlBeginEventArgs(currentPageIndex)))
-
+                    Me.InvokeOnEventContext(Sub() Me.OnPageCrawlBegin(New PageCrawlBeginEventArgs(Me.SearchQuery, currentSearchPage)))
                     Dim albums As List(Of AlbumInfo) = Await Me.FetchPageAlbumsAsync(htmlSourceCode).ConfigureAwait(False)
-
-                    Me.InvokeOnEventContext(Sub() RaiseEvent EndPageCrawl(Me, New PageCrawlEndEventArgs(currentPageIndex, albums)))
-                Next pageIndex
+                    Me.InvokeOnEventContext(Sub() Me.OnPageCrawlEnd(New PageCrawlEndEventArgs(Me.SearchQuery, currentSearchPage, albums)))
+                Next searchPage
 
                 Return True
 
@@ -347,34 +533,68 @@ Namespace FHM
         End Function
 
         ''' <summary>
-        ''' Requests the cancellation of the running fetch operation.
+        ''' Aborts a pending fetch operation started by a call to <see cref="Crawler.FetchAlbumsAsync()"/> function.
         ''' </summary>
+        '''
+        ''' <exception cref="ObjectDisposedException">
+        ''' Thrown when this instance has been disposed.
+        ''' </exception>
+        '''
         ''' <exception cref="InvalidOperationException">
-        ''' Thrown when no fetch operation is running.
+        ''' No fetch operation is running.
         ''' </exception>
         '''
         ''' <exception cref="OperationCanceledException">
-        ''' Thrown when the cancellation of the running fetch operation was already requested.
+        ''' The cancellation of the running fetch operation was already requested.
         ''' </exception>
         Public Sub CancelFetchAlbumsAsync()
+            Me.ThrowIfDisposed()
+
             If Not Me.IsFetching Then
                 Throw New InvalidOperationException("No fetch operation is running.")
             End If
 
-            ' Handle redundant cancellation calls.
+            ' Handle redundant cancellation calls to CancelFetchAlbumsAsync()...
             Me.cancelToken.ThrowIfCancellationRequested()
 
             Me.cancelTokenSrc.Cancel()
         End Sub
 
         ''' <summary>
-        ''' Resets the <see cref="Crawler.SearchFilter"/> to its default values.
+        ''' Resets the current search query (<see cref="Crawler.SearchQuery"/>) to its default values.
         ''' </summary>
-        Public Sub ResetSearchFilters()
-            Me.SearchFilter.Artist = ""
-            Me.SearchFilter.Country = "all"
-            Me.SearchFilter.Genre = "all"
-            Me.SearchFilter.Year = "all"
+        Public Sub ResetSearchQuery()
+            Me.SearchQuery.Reset()
+        End Sub
+
+#End Region
+
+#Region " Event-Invocators "
+
+        ''' <summary>
+        ''' Raises the <see cref="Crawler.PageCrawlBegin"/> event.
+        ''' </summary>
+        '''
+        ''' <param name="e">
+        ''' The <see cref="PageCrawlBeginEventArgs"/> instance containing the event data.
+        ''' </param>
+        Protected Overridable Sub OnPageCrawlBegin(e As PageCrawlBeginEventArgs)
+            If Me.PageCrawlBeginEvent IsNot Nothing Then
+                RaiseEvent PageCrawlBegin(Me, e)
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' Raises the <see cref="Crawler.PageCrawlEnd"/> event.
+        ''' </summary>
+        '''
+        ''' <param name="e">
+        ''' The <see cref="PageCrawlEndEventArgs"/> instance containing the event data.
+        ''' </param>
+        Protected Overridable Sub OnPageCrawlEnd(e As PageCrawlEndEventArgs)
+            If Me.PageCrawlEndEvent IsNot Nothing Then
+                RaiseEvent PageCrawlEnd(Me, e)
+            End If
         End Sub
 
 #End Region
@@ -382,91 +602,47 @@ Namespace FHM
 #Region " Friend Methods (pure functions, unit tested) "
 
         ''' <summary>
-        ''' Builds the address of a search results page for the specified search filter.
-        ''' </summary>
-        ''' <param name="filter">
-        ''' The search filter.
-        ''' </param>
-        '''
-        ''' <param name="pageIndex">
-        ''' The zero-based index of the search results page.
-        ''' </param>
-        ''' <returns>
-        ''' The absolute address of the search results page.
-        ''' </returns>
-        ''' <exception cref="ArgumentNullException">
-        ''' Thrown when <paramref name="filter"/> is <see langword="Nothing"/>.
-        ''' </exception>
-        '''
-        ''' <exception cref="ArgumentOutOfRangeException">
-        ''' Thrown when <paramref name="pageIndex"/> is negative.
-        ''' </exception>
-        Friend Shared Function BuildSearchQuery(filter As SearchFilter, pageIndex As Integer) As String
-            If filter Is Nothing Then
-                Throw New ArgumentNullException(paramName:=NameOf(filter))
-            End If
-            If pageIndex < 0 Then
-                Throw New ArgumentOutOfRangeException(paramName:=NameOf(pageIndex), actualValue:=pageIndex, message:="The page index cannot be negative.")
-            End If
-
-            Dim searchParams As New NameValueCollection From {
-                {"field_band", filter.Artist},
-                {"field_country", filter.Country},
-                {"field_genre", filter.Genre},
-                {"field_year", filter.Year},
-                {"field_format", "0"},
-                {"option", "com_sobi2"},
-                {"search", "Search"},
-                {"searchphrase", "exact"},
-                {"sobi2Search", ""},
-                {"sobi2Task", "axSearch"},
-                {"SobiCatSelected_0", "0"},
-                {"sobiCid", "0"},
-                {"reset", "2"},
-                {"Itemid", "13"},
-                {"SobiSearchPage", pageIndex.ToString(CultureInfo.InvariantCulture)}
-            }
-
-            Return searchParams.ToQueryString(Crawler.UriIndex)
-        End Function
-
-        ''' <summary>
         ''' Builds the address of the XML document that contains the download links of an album.
         ''' </summary>
-        ''' <param name="sobi2Id">
-        ''' The FHM identifier of the album (the <c>sobi2Id</c> query parameter of its details page).
+        '''
+        ''' <param name="albumId">
+        ''' The album identifier (that is used in the 'sobiid' and 'sobi2id' parameters).
         ''' </param>
+        '''
         ''' <returns>
         ''' The absolute address of the XML document.
         ''' </returns>
+        '''
         ''' <exception cref="ArgumentException">
-        ''' Thrown when <paramref name="sobi2Id"/> is <see langword="Nothing"/>, empty or white-space.
+        ''' Thrown when <paramref name="albumId"/> is <see langword="Nothing"/>, empty or white-space.
         ''' </exception>
-        Friend Shared Function BuildDownloadUrlsQuery(sobi2Id As String) As String
-            If String.IsNullOrWhiteSpace(sobi2Id) Then
-                Throw New ArgumentException("The album identifier cannot be null, empty or white-space.", paramName:=NameOf(sobi2Id))
+        Friend Shared Function BuildDownloadUrlsQuery(albumId As String) As String
+            If String.IsNullOrWhiteSpace(albumId) Then
+                Throw New ArgumentException("The album identifier cannot be null, empty or white-space.", paramName:=NameOf(albumId))
             End If
 
             Dim downloadUrlParams As New NameValueCollection From {
-                {"sobiid", sobi2Id},
+                {"sobiid", albumId},
                 {"sobi2Task", "addSRev"},
                 {"no_html", "1"},
                 {"option", "com_sobi2"},
                 {"rvote", "1"}
             }
-
             Return downloadUrlParams.ToQueryString(Crawler.UriIndex2)
         End Function
 
         ''' <summary>
-        ''' Gets the amount of search results pages needed to list the specified amount of albums.
+        ''' Gets the amount of search pages needed to list the specified amount of albums.
         ''' </summary>
+        '''
         ''' <param name="albumCount">
         ''' The amount of albums.
         ''' </param>
+        '''
         ''' <returns>
-        ''' The amount of search results pages.
+        ''' The amount of search pages.
         ''' </returns>
+        '''
         ''' <exception cref="ArgumentOutOfRangeException">
         ''' Thrown when <paramref name="albumCount"/> is negative.
         ''' </exception>
@@ -477,19 +653,21 @@ Namespace FHM
 
             Dim fullPages As Integer = albumCount \ Crawler.AlbumsPerPage
             Dim hasPartialPage As Boolean = (albumCount Mod Crawler.AlbumsPerPage) <> 0
-
             Return If(hasPartialPage, fullPages + 1, fullPages)
         End Function
 
         ''' <summary>
-        ''' Parses the album count from the HTML source code of a search results page.
+        ''' Parses the album count from the HTML source code of a search page.
         ''' </summary>
+        '''
         ''' <param name="htmlSourceCode">
-        ''' The HTML source code of the search results page.
+        ''' The HTML source code of the search page.
         ''' </param>
+        '''
         ''' <returns>
         ''' The album count, or <c>0</c> if the page does not contain the search result summary.
         ''' </returns>
+        '''
         ''' <exception cref="ArgumentNullException">
         ''' Thrown when <paramref name="htmlSourceCode"/> is <see langword="Nothing"/>.
         ''' </exception>
@@ -511,6 +689,7 @@ Namespace FHM
                 Return 0
             End If
 
+            ' Remove new lines, and replace tabs and duplicated white-spaces for a single white-space.
             Dim text As String = Regex.Replace(node.InnerText, "\s+", " ", RegexOptions.None).Trim()
             Dim match As Match = Regex.Match(text, "\d+", RegexOptions.None)
             If Not match.Success Then
@@ -521,16 +700,19 @@ Namespace FHM
         End Function
 
         ''' <summary>
-        ''' Parses the album listings from the HTML source code of a search results page.
+        ''' Parses the album listings from the HTML source code of a search page.
         ''' <para></para>
-        ''' Listings without a valid details link are skipped.
+        ''' Listings without a valid album link are skipped.
         ''' </summary>
+        '''
         ''' <param name="htmlSourceCode">
-        ''' The HTML source code of the search results page.
+        ''' The HTML source code of the search page.
         ''' </param>
+        '''
         ''' <returns>
         ''' The album listings found in the page (an empty list if the page does not list any album).
         ''' </returns>
+        '''
         ''' <exception cref="ArgumentNullException">
         ''' Thrown when <paramref name="htmlSourceCode"/> is <see langword="Nothing"/>.
         ''' </exception>
@@ -556,8 +738,9 @@ Namespace FHM
                     Continue For
                 End If
 
-                Dim sobi2Id As String = Nothing
-                If Not Crawler.TryExtractSobi2Id(urlNode.GetAttributeValue("href", ""), sobi2Id) Then
+                Dim albumId As String = Nothing
+                Dim albumUri As Uri = Nothing
+                If Not Crawler.TryParseAlbumLink(urlNode.GetAttributeValue("href", ""), albumId, albumUri) Then
                     Continue For
                 End If
 
@@ -567,28 +750,38 @@ Namespace FHM
                 Dim titleNode As HtmlNode = node.SelectSingleNode(Crawler.XPathAlbumTitle)
                 Dim rawTitle As String = If(titleNode Is Nothing, Crawler.UnknownFieldValue, titleNode.GetAttributeValue("title", ""))
 
-                listings.Add(New AlbumListing(Crawler.NormalizeText(rawArtist), Crawler.NormalizeText(rawTitle), sobi2Id))
+                listings.Add(New AlbumListing(Crawler.NormalizeText(rawArtist), Crawler.NormalizeText(rawTitle), albumId, albumUri))
             Next node
 
             Return listings
         End Function
 
         ''' <summary>
-        ''' Tries to extract the FHM album identifier (the <c>sobi2Id</c> query parameter) from an album details link.
+        ''' Tries to parse an album link: its absolute <see cref="Uri"/>
+        ''' and the album identifier (the <c>sobi2Id</c> query parameter).
         ''' </summary>
+        '''
         ''' <param name="href">
-        ''' The <c>href</c> attribute value of the album details link.
+        ''' The <c>href</c> attribute value of the album link.
         ''' It can be absolute or relative, with or without HTML-encoded ampersands (<c>&amp;amp;</c>).
         ''' </param>
         '''
-        ''' <param name="refSobi2Id">
+        ''' <param name="refAlbumId">
         ''' When this method returns <see langword="True"/>, contains the album identifier.
         ''' </param>
+        '''
+        ''' <param name="refAlbumUri">
+        ''' When this method returns <see langword="True"/>, contains the absolute album <see cref="Uri"/>.
+        ''' </param>
+        '''
         ''' <returns>
-        ''' <see langword="True"/> if the album identifier was found; otherwise, <see langword="False"/>.
+        ''' <see langword="True"/> if the album link is valid and contains the album identifier;
+        ''' otherwise, <see langword="False"/>.
         ''' </returns>
-        Friend Shared Function TryExtractSobi2Id(href As String, ByRef refSobi2Id As String) As Boolean
-            refSobi2Id = Nothing
+        Friend Shared Function TryParseAlbumLink(href As String, ByRef refAlbumId As String, ByRef refAlbumUri As Uri) As Boolean
+            refAlbumId = Nothing
+            refAlbumUri = Nothing
+
             If String.IsNullOrWhiteSpace(href) Then
                 Return False
             End If
@@ -599,12 +792,13 @@ Namespace FHM
                 Return False
             End If
 
-            Dim sobi2Id As String = HttpUtility.ParseQueryString(albumUri.Query)("sobi2Id")
-            If String.IsNullOrWhiteSpace(sobi2Id) Then
+            Dim albumId As String = HttpUtility.ParseQueryString(albumUri.Query)("sobi2Id")
+            If String.IsNullOrWhiteSpace(albumId) Then
                 Return False
             End If
 
-            refSobi2Id = sobi2Id.Trim()
+            refAlbumId = albumId.Trim()
+            refAlbumUri = albumUri
             Return True
         End Function
 
@@ -613,12 +807,15 @@ Namespace FHM
         ''' trims it, fixes the UTF-8 text that was decoded with the system ANSI code page,
         ''' decodes HTML entities and converts it to title case.
         ''' </summary>
+        '''
         ''' <param name="rawText">
         ''' The raw text.
         ''' </param>
+        '''
         ''' <returns>
         ''' The normalized text.
         ''' </returns>
+        '''
         ''' <exception cref="ArgumentNullException">
         ''' Thrown when <paramref name="rawText"/> is <see langword="Nothing"/>.
         ''' </exception>
@@ -631,19 +828,21 @@ Namespace FHM
             Dim text As String = Encoding.UTF8.GetString(Encoding.Default.GetBytes(rawText.Trim()))
             text = HttpUtility.HtmlDecode(text)
             text = Crawler.TitleCaseCulture.TextInfo.ToTitleCase(text)
-
             Return text
         End Function
 
         ''' <summary>
         ''' Parses the download links of an album from the XML document returned by the FHM website.
         ''' </summary>
+        '''
         ''' <param name="xml">
         ''' The XML document (root element <c>&lt;rev&gt;</c>, links in <c>&lt;msg&gt;</c>, <c>&lt;msg2&gt;</c> ... <c>&lt;msg13&gt;</c>).
         ''' </param>
+        '''
         ''' <returns>
         ''' The download links, in document order, without empty values.
         ''' </returns>
+        '''
         ''' <exception cref="ArgumentNullException">
         ''' Thrown when <paramref name="xml"/> is <see langword="Nothing"/>.
         ''' </exception>
@@ -690,12 +889,15 @@ Namespace FHM
         ''' <summary>
         ''' Downloads the content of the specified <see cref="Uri"/> as a string.
         ''' </summary>
+        '''
         ''' <param name="address">
         ''' The address to download.
         ''' </param>
+        '''
         ''' <returns>
         ''' The downloaded content.
         ''' </returns>
+        '''
         ''' <exception cref="InvalidOperationException">
         ''' Thrown when the download delegate returns a null task or a null string.
         ''' </exception>
@@ -714,26 +916,29 @@ Namespace FHM
         End Function
 
         ''' <summary>
-        ''' Parses the album listings of a search results page and downloads the download links of every album.
+        ''' Parses the albums listed in the HTML source code of a search page,
+        ''' and retrieves the download links of every album.
         ''' <para></para>
-        ''' Albums whose download links cannot be retrieved or parsed are skipped.
+        ''' Albums whose download links cannot be retrieved (network error or malformed response) are skipped.
         ''' </summary>
+        '''
         ''' <param name="htmlSourceCode">
-        ''' The HTML source code of the search results page.
+        ''' The HTML source code of the search page.
         ''' </param>
+        '''
         ''' <returns>
-        ''' The albums of the page.
+        ''' The crawled albums.
         ''' </returns>
         Private Async Function FetchPageAlbumsAsync(htmlSourceCode As String) As Task(Of List(Of AlbumInfo))
             Dim listings As List(Of AlbumListing) = Crawler.ParseAlbumListings(htmlSourceCode)
             Dim albums As New List(Of AlbumInfo)(listings.Count)
 
             For Each listing As AlbumListing In listings
-                Dim downloadUrls As String()
+                Dim downloadLinks As String()
                 Try
-                    Dim uriDownloadUrls As New Uri(Crawler.BuildDownloadUrlsQuery(listing.Sobi2Id))
-                    Dim xml As String = Await Me.DownloadAsync(uriDownloadUrls).ConfigureAwait(False)
-                    downloadUrls = Crawler.ParseDownloadUrls(xml)
+                    Dim uriDownloadLinks As New Uri(Crawler.BuildDownloadUrlsQuery(listing.Sobi2Id))
+                    Dim xml As String = Await Me.DownloadAsync(uriDownloadLinks).ConfigureAwait(False)
+                    downloadLinks = Crawler.ParseDownloadUrls(xml)
 
                 Catch ex As WebException
                     Continue For
@@ -746,18 +951,19 @@ Namespace FHM
 
                 End Try
 
-                albums.Add(New AlbumInfo(listing.Artist, listing.Title, downloadUrls))
+                albums.Add(New AlbumInfo(listing.Sobi2Id, listing.AlbumUri, listing.Artist, listing.Title, downloadLinks))
             Next listing
 
             Return albums
         End Function
 
         ''' <summary>
-        ''' Invokes the specified action on the <see cref="SynchronizationContext"/> captured when the
-        ''' current fetch operation started, or directly if there was no context (or it is the current one).
+        ''' Runs the specified action on the <see cref="SynchronizationContext"/> captured
+        ''' when the current fetch operation started (or directly, when there is none).
         ''' </summary>
+        '''
         ''' <param name="action">
-        ''' The action to invoke.
+        ''' The action to run.
         ''' </param>
         Private Sub InvokeOnEventContext(action As Action)
             Dim context As SynchronizationContext = Me.eventContext
@@ -766,6 +972,58 @@ Namespace FHM
             Else
                 context.Send(Sub(state As Object) action.Invoke(), Nothing)
             End If
+        End Sub
+
+        ''' <summary>
+        ''' Throws an <see cref="ObjectDisposedException"/> if this instance has been disposed.
+        ''' </summary>
+        '''
+        ''' <exception cref="ObjectDisposedException">
+        ''' Thrown when this instance has been disposed.
+        ''' </exception>
+        Private Sub ThrowIfDisposed()
+            If Me.isDisposed Then
+                Throw New ObjectDisposedException(Me.GetType().FullName)
+            End If
+        End Sub
+
+#End Region
+
+#Region " IDisposable Implementation "
+
+        ''' <summary>
+        ''' Flag to detect redundant calls when disposing.
+        ''' </summary>
+        Private isDisposed As Boolean = False
+
+        ''' <summary>
+        ''' Releases all the resources used by this instance.
+        ''' <para></para>
+        ''' A running fetch operation is cancelled.
+        ''' </summary>
+        Public Sub Dispose() Implements IDisposable.Dispose
+            Me.Dispose(isDisposing:=True)
+            GC.SuppressFinalize(Me)
+        End Sub
+
+        ''' <summary>
+        ''' Releases unmanaged and, optionally, managed resources.
+        ''' </summary>
+        '''
+        ''' <param name="isDisposing">
+        ''' <see langword="True"/> to release both managed and unmanaged resources;
+        ''' <see langword="False"/> to release only unmanaged resources.
+        ''' </param>
+        Protected Overridable Sub Dispose(isDisposing As Boolean)
+            If (Not Me.isDisposed) AndAlso isDisposing Then
+                If Me.IsFetching AndAlso Not Me.cancelToken.IsCancellationRequested Then
+                    Me.cancelTokenSrc.Cancel()
+                End If
+                Me.cancelTokenSrc.Dispose()
+                Me.client.Dispose()
+            End If
+
+            Me.isDisposed = True
         End Sub
 
 #End Region

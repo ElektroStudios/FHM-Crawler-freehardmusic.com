@@ -33,6 +33,11 @@ Namespace FHM
         ''' </summary>
         Friend ReadOnly Property Sobi2Id As String
 
+        ''' <summary>
+        ''' Gets the absolute <see cref="Uri"/> of the album details page.
+        ''' </summary>
+        Friend ReadOnly Property AlbumUri As Uri
+
 #End Region
 
 #Region " Constructors "
@@ -51,14 +56,19 @@ Namespace FHM
         ''' <param name="sobi2Id">
         ''' The FHM identifier of the album.
         ''' </param>
+        '''
+        ''' <param name="albumUri">
+        ''' The absolute <see cref="Uri"/> of the album details page.
+        ''' </param>
         ''' <exception cref="ArgumentNullException">
-        ''' Thrown when <paramref name="artist"/> or <paramref name="title"/> is <see langword="Nothing"/>.
+        ''' Thrown when <paramref name="artist"/>, <paramref name="title"/> or <paramref name="albumUri"/> is <see langword="Nothing"/>.
         ''' </exception>
-        ''' 
+        '''
         ''' <exception cref="ArgumentException">
-        ''' Thrown when <paramref name="sobi2Id"/> is <see langword="Nothing"/>, empty or white-space.
+        ''' Thrown when <paramref name="sobi2Id"/> is <see langword="Nothing"/>, empty or white-space,
+        ''' or when <paramref name="albumUri"/> is not absolute.
         ''' </exception>
-        Friend Sub New(artist As String, title As String, sobi2Id As String)
+        Friend Sub New(artist As String, title As String, sobi2Id As String, albumUri As Uri)
             If artist Is Nothing Then
                 Throw New ArgumentNullException(paramName:=NameOf(artist))
             End If
@@ -68,10 +78,17 @@ Namespace FHM
             If String.IsNullOrWhiteSpace(sobi2Id) Then
                 Throw New ArgumentException("The album identifier cannot be null, empty or white-space.", paramName:=NameOf(sobi2Id))
             End If
+            If albumUri Is Nothing Then
+                Throw New ArgumentNullException(paramName:=NameOf(albumUri))
+            End If
+            If Not albumUri.IsAbsoluteUri Then
+                Throw New ArgumentException("The album Uri must be absolute.", paramName:=NameOf(albumUri))
+            End If
 
             Me.Artist = artist
             Me.Title = title
             Me.Sobi2Id = sobi2Id
+            Me.AlbumUri = albumUri
         End Sub
 
 #End Region

@@ -11,6 +11,7 @@ Option Infer Off
 Imports System.Collections.Generic
 Imports System.Linq
 Imports System.Text
+Imports System.Web
 Imports System.Xml
 
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
@@ -100,6 +101,7 @@ Namespace FHMTests
             Assert.AreEqual("Iron Maiden", listings(0).Artist)
             Assert.AreEqual("The Number Of The Beast", listings(0).Title)
             Assert.AreEqual("101", listings(0).Sobi2Id)
+            Assert.AreEqual(New Uri(HttpUtility.HtmlDecode(FhmSamples.DetailsHref("101"))), listings(0).AlbumUri)
             Assert.AreEqual("Metallica", listings(1).Artist)
             Assert.AreEqual("Master Of Puppets", listings(1).Title)
             Assert.AreEqual("202", listings(1).Sobi2Id)
@@ -177,7 +179,7 @@ Namespace FHMTests
 
 #End Region
 
-#Region " TryExtractSobi2Id "
+#Region " TryParseAlbumLink "
 
         ''' <summary>
         ''' The album identifier is extracted from absolute and relative links,
@@ -189,13 +191,32 @@ Namespace FHMTests
         <DataRow("/index.php?sobi2Id=789&option=com_sobi2", "789")>
         <DataRow("index.php?option=com_sobi2&amp;SOBI2ID=1011", "1011")>
         <DataRow("  http://freehardmusic.com/index.php?sobi2Id=%2012%20  ", "12")>
-        Public Sub TryExtractSobi2Id_ValidLink_ReturnsTheId(href As String, expectedId As String)
-            Dim sobi2Id As String = Nothing
+        Public Sub TryParseAlbumLink_ValidLink_ReturnsTheId(href As String, expectedId As String)
+            Dim albumId As String = Nothing
+            Dim albumUri As Uri = Nothing
 
-            Dim success As Boolean = Crawler.TryExtractSobi2Id(href, sobi2Id)
+            Dim success As Boolean = Crawler.TryParseAlbumLink(href, albumId, albumUri)
 
             Assert.IsTrue(success)
-            Assert.AreEqual(expectedId, sobi2Id)
+            Assert.AreEqual(expectedId, albumId)
+        End Sub
+
+        ''' <summary>
+        ''' The album link is returned as an absolute <see cref="Uri"/>,
+        ''' with the HTML-encoded ampersands decoded and relative links resolved against the FHM website.
+        ''' </summary>
+        <TestMethod>
+        <DataRow("http://freehardmusic.com/index.php?option=com_sobi2&amp;sobi2Id=123&amp;Itemid=13", "http://freehardmusic.com/index.php?option=com_sobi2&sobi2Id=123&Itemid=13")>
+        <DataRow("/index.php?sobi2Id=789&option=com_sobi2", "http://freehardmusic.com/index.php?sobi2Id=789&option=com_sobi2")>
+        <DataRow("index.php?sobi2Id=1011", "http://freehardmusic.com/index.php?sobi2Id=1011")>
+        Public Sub TryParseAlbumLink_ValidLink_ReturnsTheAbsoluteUri(href As String, expectedUri As String)
+            Dim albumId As String = Nothing
+            Dim albumUri As Uri = Nothing
+
+            Assert.IsTrue(Crawler.TryParseAlbumLink(href, albumId, albumUri))
+
+            Assert.IsTrue(albumUri.IsAbsoluteUri)
+            Assert.AreEqual(New Uri(expectedUri), albumUri)
         End Sub
 
         ''' <summary>
@@ -208,24 +229,28 @@ Namespace FHMTests
         <DataRow("http://freehardmusic.com/index.php?option=com_sobi2&amp;Itemid=13")>
         <DataRow("http://freehardmusic.com/index.php?sobi2Id=")>
         <DataRow("http://freehardmusic.com/index.php?sobi2Id=%20%20")>
-        Public Sub TryExtractSobi2Id_LinkWithoutId_ReturnsFalse(href As String)
-            Dim sobi2Id As String = "previous value"
+        Public Sub TryParseAlbumLink_LinkWithoutId_ReturnsFalse(href As String)
+            Dim albumId As String = "previous value"
+            Dim albumUri As New Uri("http://previous/")
 
-            Dim success As Boolean = Crawler.TryExtractSobi2Id(href, sobi2Id)
+            Dim success As Boolean = Crawler.TryParseAlbumLink(href, albumId, albumUri)
 
             Assert.IsFalse(success)
-            Assert.IsNull(sobi2Id)
+            Assert.IsNull(albumId)
+            Assert.IsNull(albumUri)
         End Sub
 
         ''' <summary>
         ''' A null link is rejected without throwing.
         ''' </summary>
         <TestMethod>
-        Public Sub TryExtractSobi2Id_Null_ReturnsFalse()
-            Dim sobi2Id As String = Nothing
+        Public Sub TryParseAlbumLink_Null_ReturnsFalse()
+            Dim albumId As String = Nothing
+            Dim albumUri As Uri = Nothing
 
-            Assert.IsFalse(Crawler.TryExtractSobi2Id(Nothing, sobi2Id))
-            Assert.IsNull(sobi2Id)
+            Assert.IsFalse(Crawler.TryParseAlbumLink(Nothing, albumId, albumUri))
+            Assert.IsNull(albumId)
+            Assert.IsNull(albumUri)
         End Sub
 
 #End Region

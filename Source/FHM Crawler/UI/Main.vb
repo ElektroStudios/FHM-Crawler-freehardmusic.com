@@ -131,16 +131,13 @@ Public Class Main : Inherits System.Windows.Forms.Form
                 Me.FHMCrawler = New Crawler(Me.cookies)
             End If
 
+            ' The search query rejects mixing an artist name with country, genre or year criteria,
+            ' so the criteria of the previous search must be cleared first.
+            Me.FHMCrawler.ResetSearchQuery()
             If Me.GroupBox_ArtistSearch.Enabled Then
-                With Me.FHMCrawler.SearchFilter
-                    .Artist = Me.TextBoxArtist.Text
-                    .Country = "all"
-                    .Genre = "all"
-                    .Year = "all"
-                End With
+                Me.FHMCrawler.SearchQuery.Artist = Me.TextBoxArtist.Text
             Else
-                With Me.FHMCrawler.SearchFilter
-                    .Artist = String.Empty
+                With Me.FHMCrawler.SearchQuery
                     .Country = Me.ComboBox_Country.Text
                     .Genre = Me.ComboBox_Genre.Text
                     .Year = Me.ComboBox_Year.Text
@@ -169,6 +166,14 @@ Public Class Main : Inherits System.Windows.Forms.Form
             Me.EnableControls()
         End Try
 
+    End Sub
+
+    Private Sub Main_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
+        ' The crawler is created on the first search.
+        If Me.FHMCrawler IsNot Nothing Then
+            Me.FHMCrawler.Dispose()
+            Me.FHMCrawler = Nothing
+        End If
     End Sub
 
     Private Sub Button_Cancel_Click(sender As Object, e As EventArgs) Handles Button_Cancel.Click
@@ -235,8 +240,8 @@ Public Class Main : Inherits System.Windows.Forms.Form
     End Sub
 
     <DebuggerStepperBoundary>
-    Private Sub FHMCrawler_BeginPageCrawl(sender As Object, e As PageCrawlBeginEventArgs) Handles FHMCrawler.BeginPageCrawl
-        Dim msg As String = $"Begin crawling page index: {e.PageIndex}"
+    Private Sub FHMCrawler_PageCrawlBegin(sender As Object, e As PageCrawlBeginEventArgs) Handles FHMCrawler.PageCrawlBegin
+        Dim msg As String = $"Begin crawling page index: {e.SearchPage}"
         Me.Label_Debug.Text = msg
 #If DEBUG Then
         Debug.WriteLine(msg)
@@ -244,8 +249,8 @@ Public Class Main : Inherits System.Windows.Forms.Form
     End Sub
 
     <DebuggerStepperBoundary>
-    Private Sub FHMCrawler_EndPageCrawl(sender As Object, e As PageCrawlEndEventArgs) Handles FHMCrawler.EndPageCrawl
-        Dim msg As String = $"End crawling page index: {e.PageIndex}"
+    Private Sub FHMCrawler_PageCrawlEnd(sender As Object, e As PageCrawlEndEventArgs) Handles FHMCrawler.PageCrawlEnd
+        Dim msg As String = $"End crawling page index: {e.SearchPage}"
         Me.Label_Debug.Text = msg
 #If DEBUG Then
         Debug.WriteLine(msg)
@@ -253,7 +258,7 @@ Public Class Main : Inherits System.Windows.Forms.Form
 
         Me.ListView_Albums.BeginUpdate()
         For Each albumInfo As AlbumInfo In e.Albums
-            Dim lvItem As New ListViewItem({albumInfo.Artist, albumInfo.Album, String.Format("{{{0}}}", String.Join(", ", albumInfo.DounloadUrls))})
+            Dim lvItem As New ListViewItem({albumInfo.Artist, albumInfo.Title, $"{{{String.Join(", ", albumInfo.DownloadLinks)}}}"})
             Me.ListView_Albums.Items.Add(lvItem)
         Next albumInfo
         Me.ListView_Albums.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent)

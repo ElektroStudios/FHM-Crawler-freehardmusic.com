@@ -28,24 +28,24 @@ Namespace FHMTests
     <TestClass>
     Public NotInheritable Class CrawlerQueryTests
 
-#Region " BuildSearchQuery "
+#Region " SearchQuery.Uri "
 
         ''' <summary>
         ''' The search query targets the FHM search page.
         ''' </summary>
         <TestMethod>
-        Public Sub BuildSearchQuery_TargetsTheSearchPage()
-            Dim query As String = Crawler.BuildSearchQuery(New SearchFilter(), pageIndex:=0)
+        Public Sub SearchQueryUri_TargetsTheSearchPage()
+            Dim address As Uri = New SearchQuery().Uri(searchPage:=0)
 
-            StringAssert.StartsWith(query, "http://freehardmusic.com/index.php?")
+            StringAssert.StartsWith(address.AbsoluteUri, "http://freehardmusic.com/index.php?")
         End Sub
 
         ''' <summary>
-        ''' The search query contains all the parameters expected by the website, in the original order.
+        ''' The search query contains the parameters sent by the FHM search form, in the same order.
         ''' </summary>
         <TestMethod>
-        Public Sub BuildSearchQuery_ContainsExpectedParametersInOrder()
-            Dim query As NameValueCollection = CrawlerQueryTests.ParseQuery(Crawler.BuildSearchQuery(New SearchFilter(), pageIndex:=0))
+        Public Sub SearchQueryUri_ContainsExpectedParametersInOrder()
+            Dim query As NameValueCollection = CrawlerQueryTests.ParseQuery(New SearchQuery().Uri(searchPage:=0))
 
             Dim expectedKeys As String() = {
                 "field_band", "field_country", "field_genre", "field_year", "field_format",
@@ -67,63 +67,75 @@ Namespace FHMTests
         End Sub
 
         ''' <summary>
-        ''' The search query carries the values of the search filter.
+        ''' The search query carries the custom search criteria.
         ''' </summary>
         <TestMethod>
-        Public Sub BuildSearchQuery_CarriesSearchFilterValues()
-            Dim filter As New SearchFilter(genre:="Heavy metal", country:="Spain", year:="1986")
-            filter.Artist = "Barón Rojo"
+        Public Sub SearchQueryUri_CarriesCustomSearchCriteria()
+            Dim searchQuery As New SearchQuery(genre:="Heavy metal", country:="Spain", year:="1986")
 
-            Dim query As NameValueCollection = CrawlerQueryTests.ParseQuery(Crawler.BuildSearchQuery(filter, pageIndex:=0))
+            Dim query As NameValueCollection = CrawlerQueryTests.ParseQuery(searchQuery.Uri(searchPage:=0))
 
-            Assert.AreEqual("Barón Rojo", query("field_band"))
+            Assert.AreEqual("", query("field_band"))
             Assert.AreEqual("Spain", query("field_country"))
             Assert.AreEqual("Heavy metal", query("field_genre"))
             Assert.AreEqual("1986", query("field_year"))
         End Sub
 
         ''' <summary>
-        ''' Reserved URL characters in the filter values are encoded, so they cannot break the query string.
+        ''' The search query carries the artist name (non-ASCII characters included).
         ''' </summary>
         <TestMethod>
-        Public Sub BuildSearchQuery_EncodesReservedCharacters()
-            Dim filter As New SearchFilter("Guns & Roses?=#")
+        Public Sub SearchQueryUri_CarriesArtistName()
+            Dim query As NameValueCollection = CrawlerQueryTests.ParseQuery(New SearchQuery("Barón Rojo").Uri(searchPage:=0))
 
-            Dim rawQuery As String = Crawler.BuildSearchQuery(filter, pageIndex:=0)
-            Dim query As NameValueCollection = CrawlerQueryTests.ParseQuery(rawQuery)
-
-            Assert.AreEqual("Guns & Roses?=#", query("field_band"))
-            Assert.AreEqual(15, query.Count)
-            StringAssert.Contains(rawQuery, "field_band=Guns+%26+Roses%3f%3d%23")
+            Assert.AreEqual("Barón Rojo", query("field_band"))
+            Assert.AreEqual("all", query("field_country"))
+            Assert.AreEqual("all", query("field_genre"))
+            Assert.AreEqual("all", query("field_year"))
         End Sub
 
         ''' <summary>
-        ''' The search query carries the requested (zero-based) page index.
+        ''' Reserved URL characters in the artist name are encoded, so they do not break the query string.
+        ''' </summary>
+        <TestMethod>
+        Public Sub SearchQueryUri_EncodesReservedCharacters()
+            Dim address As Uri = New SearchQuery("Guns & Roses?=#").Uri(searchPage:=0)
+            Dim query As NameValueCollection = CrawlerQueryTests.ParseQuery(address)
+
+            Assert.AreEqual("Guns & Roses?=#", query("field_band"))
+            Assert.AreEqual(15, query.Count)
+            StringAssert.Contains(address.OriginalString, "field_band=Guns+%26+Roses%3f%3d%23")
+        End Sub
+
+        ''' <summary>
+        ''' The search query carries the search page index.
         ''' </summary>
         <TestMethod>
         <DataRow(0)>
         <DataRow(1)>
         <DataRow(57)>
-        Public Sub BuildSearchQuery_CarriesPageIndex(pageIndex As Integer)
-            Dim query As NameValueCollection = CrawlerQueryTests.ParseQuery(Crawler.BuildSearchQuery(New SearchFilter(), pageIndex))
+        Public Sub SearchQueryUri_CarriesSearchPage(searchPage As Integer)
+            Dim query As NameValueCollection = CrawlerQueryTests.ParseQuery(New SearchQuery().Uri(searchPage))
 
-            Assert.AreEqual(pageIndex.ToString(CultureInfo.InvariantCulture), query("SobiSearchPage"))
+            Assert.AreEqual(searchPage.ToString(CultureInfo.InvariantCulture), query("SobiSearchPage"))
         End Sub
 
         ''' <summary>
-        ''' A null search filter is rejected.
+        ''' The parameterless Uri property represents the first search page.
         ''' </summary>
         <TestMethod>
-        Public Sub BuildSearchQuery_NullFilter_Throws()
-            Assert.ThrowsExactly(Of ArgumentNullException)(Sub() Crawler.BuildSearchQuery(Nothing, pageIndex:=0))
+        Public Sub SearchQueryUri_Default_IsTheFirstSearchPage()
+            Dim searchQuery As New SearchQuery("Accept")
+
+            Assert.AreEqual(searchQuery.Uri(searchPage:=0), searchQuery.Uri)
         End Sub
 
         ''' <summary>
-        ''' A negative page index is rejected.
+        ''' A negative search page index is rejected.
         ''' </summary>
         <TestMethod>
-        Public Sub BuildSearchQuery_NegativePageIndex_Throws()
-            Assert.ThrowsExactly(Of ArgumentOutOfRangeException)(Sub() Crawler.BuildSearchQuery(New SearchFilter(), pageIndex:=-1))
+        Public Sub SearchQueryUri_NegativeSearchPage_Throws()
+            Assert.ThrowsExactly(Of ArgumentOutOfRangeException)(Function() New SearchQuery().Uri(searchPage:=-1))
         End Sub
 
 #End Region
@@ -210,7 +222,22 @@ Namespace FHMTests
         ''' The parsed (decoded) query parameters.
         ''' </returns>
         Private Shared Function ParseQuery(address As String) As NameValueCollection
-            Return HttpUtility.ParseQueryString(New Uri(address).Query)
+            Return CrawlerQueryTests.ParseQuery(New Uri(address))
+        End Function
+
+        ''' <summary>
+        ''' Parses the query string parameters of an address.
+        ''' </summary>
+        '''
+        ''' <param name="address">
+        ''' The address.
+        ''' </param>
+        '''
+        ''' <returns>
+        ''' The decoded query string parameters, in order.
+        ''' </returns>
+        Private Shared Function ParseQuery(address As Uri) As NameValueCollection
+            Return HttpUtility.ParseQueryString(address.Query)
         End Function
 
 #End Region

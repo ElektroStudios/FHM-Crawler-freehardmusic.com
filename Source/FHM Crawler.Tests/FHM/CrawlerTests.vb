@@ -37,11 +37,11 @@ Namespace FHMTests
             Dim fhmCrawler As New Crawler(cookies)
 
             Assert.AreSame(cookies, fhmCrawler.Cookies)
-            Assert.IsNotNull(fhmCrawler.SearchFilter)
-            Assert.AreEqual("", fhmCrawler.SearchFilter.Artist)
-            Assert.AreEqual("all", fhmCrawler.SearchFilter.Country)
-            Assert.AreEqual("all", fhmCrawler.SearchFilter.Genre)
-            Assert.AreEqual("all", fhmCrawler.SearchFilter.Year)
+            Assert.IsNotNull(fhmCrawler.SearchQuery)
+            Assert.AreEqual("", fhmCrawler.SearchQuery.Artist)
+            Assert.AreEqual("all", fhmCrawler.SearchQuery.Country)
+            Assert.AreEqual("all", fhmCrawler.SearchQuery.Genre)
+            Assert.AreEqual("all", fhmCrawler.SearchQuery.Year)
             Assert.IsFalse(fhmCrawler.IsFetching)
         End Sub
 
@@ -84,24 +84,70 @@ Namespace FHMTests
         End Sub
 
         ''' <summary>
-        ''' Resetting the search filters restores the default values (the instance is kept).
+        ''' ResetSearchQuery restores the default values of an artist-name based search query.
         ''' </summary>
         <TestMethod>
-        Public Sub ResetSearchFilters_RestoresDefaults()
+        Public Sub ResetSearchQuery_FromArtistSearch_RestoresDefaults()
             Dim fhmCrawler As New Crawler(New CookieContainer())
-            Dim filter As SearchFilter = fhmCrawler.SearchFilter
-            filter.Artist = "Saxon"
-            filter.Country = "United Kingdom"
-            filter.Genre = "NWOBHM"
-            filter.Year = "1980"
+            Dim query As SearchQuery = fhmCrawler.SearchQuery
+            query.Artist = "Saxon"
 
-            fhmCrawler.ResetSearchFilters()
+            fhmCrawler.ResetSearchQuery()
 
-            Assert.AreSame(filter, fhmCrawler.SearchFilter)
-            Assert.AreEqual("", filter.Artist)
-            Assert.AreEqual("all", filter.Country)
-            Assert.AreEqual("all", filter.Genre)
-            Assert.AreEqual("all", filter.Year)
+            Assert.AreSame(query, fhmCrawler.SearchQuery)
+            Assert.AreEqual("", query.Artist)
+            Assert.AreEqual("all", query.Country)
+            Assert.AreEqual("all", query.Genre)
+            Assert.AreEqual("all", query.Year)
+        End Sub
+
+        ''' <summary>
+        ''' ResetSearchQuery restores the default values of a custom search query.
+        ''' </summary>
+        <TestMethod>
+        Public Sub ResetSearchQuery_FromCustomSearch_RestoresDefaults()
+            Dim fhmCrawler As New Crawler(New CookieContainer())
+            Dim query As SearchQuery = fhmCrawler.SearchQuery
+            query.Country = "United Kingdom"
+            query.Genre = "NWOBHM"
+            query.Year = "1980"
+
+            fhmCrawler.ResetSearchQuery()
+
+            Assert.AreSame(query, fhmCrawler.SearchQuery)
+            Assert.AreEqual("", query.Artist)
+            Assert.AreEqual("all", query.Country)
+            Assert.AreEqual("all", query.Genre)
+            Assert.AreEqual("all", query.Year)
+        End Sub
+
+        ''' <summary>
+        ''' Once disposed, the crawler rejects any operation.
+        ''' </summary>
+        <TestMethod>
+        Public Async Function Dispose_ThenOperations_ThrowObjectDisposedException() As Task
+            Dim fhmCrawler As New Crawler(New CookieContainer(), Function(address As Uri) Task.FromResult(""))
+
+            fhmCrawler.Dispose()
+
+            Assert.ThrowsExactly(Of ObjectDisposedException)(Function() fhmCrawler.GetAlbumCount())
+            Assert.ThrowsExactly(Of ObjectDisposedException)(Sub() fhmCrawler.FetchAlbums())
+            Assert.ThrowsExactly(Of ObjectDisposedException)(Sub() fhmCrawler.CancelFetchAlbumsAsync())
+            Await Assert.ThrowsExactlyAsync(Of ObjectDisposedException)(Function() fhmCrawler.GetAlbumCountAsync()).ConfigureAwait(False)
+            Await Assert.ThrowsExactlyAsync(Of ObjectDisposedException)(Function() fhmCrawler.FetchAlbumsAsync()).ConfigureAwait(False)
+        End Function
+
+        ''' <summary>
+        ''' Disposing the crawler more than once is harmless.
+        ''' </summary>
+        <TestMethod>
+        Public Sub Dispose_CalledTwice_IsHarmless()
+            Dim fhmCrawler As New Crawler(New CookieContainer())
+
+            fhmCrawler.Dispose()
+            fhmCrawler.Dispose()
+
+            Assert.IsFalse(fhmCrawler.IsFetching)
         End Sub
 
     End Class

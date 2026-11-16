@@ -37,7 +37,7 @@ Namespace Infrastructure
         Private ReadOnly sequenceList As New List(Of String)
 
         ''' <summary>
-        ''' The recorded <see cref="Crawler.EndPageCrawl"/> event data, in order.
+        ''' The recorded <see cref="Crawler.PageCrawlEnd"/> event data, in order.
         ''' </summary>
         Private ReadOnly endPagesList As New List(Of PageCrawlEndEventArgs)
 
@@ -62,7 +62,7 @@ Namespace Infrastructure
         End Property
 
         ''' <summary>
-        ''' Gets a snapshot of the recorded <see cref="Crawler.EndPageCrawl"/> event data, in order.
+        ''' Gets a snapshot of the recorded <see cref="Crawler.PageCrawlEnd"/> event data, in order.
         ''' </summary>
         Friend ReadOnly Property EndPages As PageCrawlEndEventArgs()
             Get
@@ -99,8 +99,8 @@ Namespace Infrastructure
                 Throw New ArgumentNullException(paramName:=NameOf(fhmCrawler))
             End If
 
-            AddHandler fhmCrawler.BeginPageCrawl, AddressOf Me.OnBeginPageCrawl
-            AddHandler fhmCrawler.EndPageCrawl, AddressOf Me.OnEndPageCrawl
+            AddHandler fhmCrawler.PageCrawlBegin, AddressOf Me.OnPageCrawlBegin
+            AddHandler fhmCrawler.PageCrawlEnd, AddressOf Me.OnPageCrawlEnd
         End Sub
 
 #End Region
@@ -108,7 +108,7 @@ Namespace Infrastructure
 #Region " Event Handlers "
 
         ''' <summary>
-        ''' Handles the <see cref="Crawler.BeginPageCrawl"/> event.
+        ''' Handles the <see cref="Crawler.PageCrawlBegin"/> event.
         ''' </summary>
         ''' <param name="sender">
         ''' The source of the event.
@@ -117,15 +117,15 @@ Namespace Infrastructure
         ''' <param name="e">
         ''' The event data.
         ''' </param>
-        Private Sub OnBeginPageCrawl(sender As Object, e As PageCrawlBeginEventArgs)
+        Private Sub OnPageCrawlBegin(sender As Object, e As PageCrawlBeginEventArgs)
             SyncLock Me.syncRoot
                 Me.sendersList.Add(sender)
-                Me.sequenceList.Add($"Begin:{e.PageIndex.ToString(CultureInfo.InvariantCulture)}")
+                Me.sequenceList.Add($"Begin:{e.SearchPage.ToString(CultureInfo.InvariantCulture)}")
             End SyncLock
         End Sub
 
         ''' <summary>
-        ''' Handles the <see cref="Crawler.EndPageCrawl"/> event.
+        ''' Handles the <see cref="Crawler.PageCrawlEnd"/> event.
         ''' </summary>
         ''' <param name="sender">
         ''' The source of the event.
@@ -134,10 +134,10 @@ Namespace Infrastructure
         ''' <param name="e">
         ''' The event data.
         ''' </param>
-        Private Sub OnEndPageCrawl(sender As Object, e As PageCrawlEndEventArgs)
+        Private Sub OnPageCrawlEnd(sender As Object, e As PageCrawlEndEventArgs)
             SyncLock Me.syncRoot
                 Me.sendersList.Add(sender)
-                Me.sequenceList.Add($"End:{e.PageIndex.ToString(CultureInfo.InvariantCulture)}")
+                Me.sequenceList.Add($"End:{e.SearchPage.ToString(CultureInfo.InvariantCulture)}")
                 Me.endPagesList.Add(e)
             End SyncLock
         End Sub

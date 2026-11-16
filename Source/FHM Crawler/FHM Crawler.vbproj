@@ -99,7 +99,7 @@
     <Compile Include="FHM\AlbumListing.vb" />
     <Compile Include="FHM\PageCrawlBeginEventArgs.vb" />
     <Compile Include="FHM\PageCrawlEndEventArgs.vb" />
-    <Compile Include="FHM\SearchFilter.vb" />
+    <Compile Include="FHM\SearchQuery.vb" />
     <Compile Include="UI\DataSources.vb" />
     <Compile Include="FHM\Crawler.vb" />
     <Compile Include="UI\Main.vb">

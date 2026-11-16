@@ -9,6 +9,7 @@ Option Infer Off
 #Region " Imports "
 
 Imports System.Collections.Generic
+Imports System.Collections.ObjectModel
 Imports System.Collections.Specialized
 Imports System.Linq
 Imports System.Net
@@ -65,14 +66,14 @@ Namespace FHMTests
         End Sub
 
         ''' <summary>
-        ''' The search request carries the current search filter.
+        ''' The search request carries the current search query.
         ''' </summary>
         <TestMethod>
-        Public Async Function GetAlbumCountAsync_UsesTheCurrentSearchFilter() As Task
+        Public Async Function GetAlbumCountAsync_UsesTheCurrentSearchQuery() As Task
             Dim server As New FakeWebServer()
             server.AddResponse(FakeWebServer.SearchPage(0), FhmSamples.SearchPage(1))
             Dim fhmCrawler As Crawler = CrawlerFetchTests.CreateCrawler(server)
-            fhmCrawler.SearchFilter.Artist = "Accept"
+            fhmCrawler.SearchQuery.Artist = "Accept"
 
             Await fhmCrawler.GetAlbumCountAsync().ConfigureAwait(False)
 
@@ -148,19 +149,21 @@ Namespace FHMTests
             CollectionAssert.AreEqual({"Begin:0", "End:0", "Begin:1", "End:1"}, recorder.Sequence)
             Assert.IsTrue(recorder.Senders.All(Function(sender As Object) sender Is fhmCrawler))
 
-            Dim page0 As List(Of AlbumInfo) = recorder.EndPages(0).Albums
+            Dim page0 As ReadOnlyCollection(Of AlbumInfo) = recorder.EndPages(0).Albums
             Assert.AreEqual(2, page0.Count)
             Assert.AreEqual("Dio", page0(0).Artist)
-            Assert.AreEqual("Holy Diver", page0(0).Album)
-            CollectionAssert.AreEqual({"http://host/dio-1", "http://host/dio-2"}, page0(0).DounloadUrls)
+            Assert.AreEqual("Holy Diver", page0(0).Title)
+            CollectionAssert.AreEqual({"http://host/dio-1", "http://host/dio-2"}, page0(0).DownloadLinks)
+            Assert.AreEqual("1", page0(0).Id)
+            Assert.AreEqual(New Uri(HttpUtility.HtmlDecode(FhmSamples.DetailsHref("1"))), page0(0).Uri)
             Assert.AreEqual("Rainbow", page0(1).Artist)
-            CollectionAssert.AreEqual({"http://host/rainbow"}, page0(1).DounloadUrls)
+            CollectionAssert.AreEqual({"http://host/rainbow"}, page0(1).DownloadLinks)
 
-            Dim page1 As List(Of AlbumInfo) = recorder.EndPages(1).Albums
+            Dim page1 As ReadOnlyCollection(Of AlbumInfo) = recorder.EndPages(1).Albums
             Assert.AreEqual(1, page1.Count)
             Assert.AreEqual("Scorpions", page1(0).Artist)
-            Assert.AreEqual("Blackout", page1(0).Album)
-            Assert.AreEqual(0, page1(0).DounloadUrls.Length)
+            Assert.AreEqual("Blackout", page1(0).Title)
+            Assert.AreEqual(0, page1(0).DownloadLinks.Count)
         End Function
 
         ''' <summary>
@@ -223,10 +226,10 @@ Namespace FHMTests
             Dim completed As Boolean = Await fhmCrawler.FetchAlbumsAsync().ConfigureAwait(False)
 
             Assert.IsTrue(completed)
-            Dim albums As List(Of AlbumInfo) = recorder.EndPages.Single().Albums
+            Dim albums As ReadOnlyCollection(Of AlbumInfo) = recorder.EndPages.Single().Albums
             Assert.AreEqual(1, albums.Count)
             Assert.AreEqual("Valid", albums(0).Artist)
-            CollectionAssert.AreEqual({"http://host/valid"}, albums(0).DounloadUrls)
+            CollectionAssert.AreEqual({"http://host/valid"}, albums(0).DownloadLinks)
         End Function
 
         ''' <summary>
@@ -335,8 +338,8 @@ Namespace FHMTests
             Dim fhmCrawler As Crawler = CrawlerFetchTests.CreateCrawler(server)
             Dim context As New RecordingSynchronizationContext()
             Dim raisedInsideContext As New List(Of Boolean)
-            AddHandler fhmCrawler.BeginPageCrawl, Sub(sender As Object, e As PageCrawlBeginEventArgs) raisedInsideContext.Add(context.IsInsideSend)
-            AddHandler fhmCrawler.EndPageCrawl, Sub(sender As Object, e As PageCrawlEndEventArgs) raisedInsideContext.Add(context.IsInsideSend)
+            AddHandler fhmCrawler.PageCrawlBegin, Sub(sender As Object, e As PageCrawlBeginEventArgs) raisedInsideContext.Add(context.IsInsideSend)
+            AddHandler fhmCrawler.PageCrawlEnd, Sub(sender As Object, e As PageCrawlEndEventArgs) raisedInsideContext.Add(context.IsInsideSend)
 
             Dim fetchTask As Task(Of Boolean)
             Dim previousContext As SynchronizationContext = SynchronizationContext.Current
@@ -440,6 +443,51 @@ Namespace FHMTests
 
 #End Region
 
+#Region " Event-Invocators "
+
+        ''' <summary>
+        ''' The event data carries the search query of the crawler and the index of the search page.
+        ''' </summary>
+        <TestMethod>
+        Public Async Function FetchAlbumsAsync_EventDataCarriesTheSearchQuery() As Task
+            Dim server As New FakeWebServer()
+            server.AddResponse(FakeWebServer.SearchPage(0), FhmSamples.SearchPage(1, FhmSamples.AlbumTableWithId("accept", "balls to the wall", "1")))
+            server.AddResponse(FakeWebServer.DownloadLinks("1"), FhmSamples.DownloadLinksXml("http://host/accept"))
+            Dim fhmCrawler As Crawler = CrawlerFetchTests.CreateCrawler(server)
+            fhmCrawler.SearchQuery.Artist = "Accept"
+            Dim beginArgs As New List(Of PageCrawlBeginEventArgs)
+            Dim endArgs As New List(Of PageCrawlEndEventArgs)
+            AddHandler fhmCrawler.PageCrawlBegin, Sub(sender As Object, e As PageCrawlBeginEventArgs) beginArgs.Add(e)
+            AddHandler fhmCrawler.PageCrawlEnd, Sub(sender As Object, e As PageCrawlEndEventArgs) endArgs.Add(e)
+
+            Assert.IsTrue(Await fhmCrawler.FetchAlbumsAsync().ConfigureAwait(False))
+
+            Assert.AreSame(fhmCrawler.SearchQuery, beginArgs.Single().SearchQuery)
+            Assert.AreEqual(0, beginArgs.Single().SearchPage)
+            Assert.AreSame(fhmCrawler.SearchQuery, endArgs.Single().SearchQuery)
+            Assert.AreEqual(0, endArgs.Single().SearchPage)
+        End Function
+
+        ''' <summary>
+        ''' Derived classes can override the event invocators;
+        ''' the events are still raised when the overrides call the base implementation.
+        ''' </summary>
+        <TestMethod>
+        Public Async Function FetchAlbumsAsync_DerivedClass_OverridesTheEventInvocators() As Task
+            Dim server As New FakeWebServer()
+            server.AddResponse(FakeWebServer.SearchPage(0), FhmSamples.SearchPage(1, FhmSamples.AlbumTableWithId("accept", "balls to the wall", "1")))
+            server.AddResponse(FakeWebServer.DownloadLinks("1"), FhmSamples.DownloadLinksXml("http://host/accept"))
+            Dim fhmCrawler As New OverridingCrawler(server)
+            Dim recorder As New CrawlEventRecorder(fhmCrawler)
+
+            Assert.IsTrue(Await fhmCrawler.FetchAlbumsAsync().ConfigureAwait(False))
+
+            CollectionAssert.AreEqual({"OnPageCrawlBegin:0", "OnPageCrawlEnd:0"}, fhmCrawler.Calls)
+            CollectionAssert.AreEqual({"Begin:0", "End:0"}, recorder.Sequence)
+        End Function
+
+#End Region
+
 #Region " Private Methods "
 
         ''' <summary>
@@ -454,6 +502,67 @@ Namespace FHMTests
         Private Shared Function CreateCrawler(server As FakeWebServer) As Crawler
             Return New Crawler(New CookieContainer(), AddressOf server.DownloadStringAsync)
         End Function
+
+#End Region
+
+#Region " Test Doubles "
+
+        ''' <summary>
+        ''' A <see cref="Crawler"/> that records the calls to its event invocators,
+        ''' and downloads its content from a fake server.
+        ''' </summary>
+        Private NotInheritable Class OverridingCrawler : Inherits Crawler
+
+            ''' <summary>
+            ''' The recorded calls, in order.
+            ''' </summary>
+            Private ReadOnly callList As New List(Of String)
+
+            ''' <summary>
+            ''' Gets the recorded calls to the event invocators, in order (for example, <c>"OnPageCrawlBegin:0"</c>).
+            ''' </summary>
+            Friend ReadOnly Property Calls As String()
+                Get
+                    Return Me.callList.ToArray()
+                End Get
+            End Property
+
+            ''' <summary>
+            ''' Initializes a new instance of the <see cref="OverridingCrawler"/> class.
+            ''' </summary>
+            '''
+            ''' <param name="server">
+            ''' The fake server.
+            ''' </param>
+            Friend Sub New(server As FakeWebServer)
+                MyBase.New(New CookieContainer(), AddressOf server.DownloadStringAsync)
+            End Sub
+
+            ''' <summary>
+            ''' Records the call and raises the <see cref="Crawler.PageCrawlBegin"/> event.
+            ''' </summary>
+            '''
+            ''' <param name="e">
+            ''' The event data.
+            ''' </param>
+            Protected Overrides Sub OnPageCrawlBegin(e As PageCrawlBeginEventArgs)
+                Me.callList.Add($"OnPageCrawlBegin:{e.SearchPage}")
+                MyBase.OnPageCrawlBegin(e)
+            End Sub
+
+            ''' <summary>
+            ''' Records the call and raises the <see cref="Crawler.PageCrawlEnd"/> event.
+            ''' </summary>
+            '''
+            ''' <param name="e">
+            ''' The event data.
+            ''' </param>
+            Protected Overrides Sub OnPageCrawlEnd(e As PageCrawlEndEventArgs)
+                Me.callList.Add($"OnPageCrawlEnd:{e.SearchPage}")
+                MyBase.OnPageCrawlEnd(e)
+            End Sub
+
+        End Class
 
 #End Region
 
